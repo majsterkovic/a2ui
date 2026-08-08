@@ -14,8 +14,17 @@
  * limitations under the License.
  */
 
-import {ChangeDetectionStrategy, Component, input} from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  EnvironmentInjector,
+  effect,
+  inject,
+  input,
+} from '@angular/core';
 import {ComponentHostComponent} from './component-host.component';
+import {A2uiRendererService} from './a2ui-renderer.service';
+import {prepareUniversalCatalog} from '../catalog/to_web_component';
 
 /**
  * High-level component for rendering an entire A2UI surface.
@@ -49,4 +58,19 @@ export class SurfaceComponent {
    * Defaults to the root ('/').
    */
   dataContextPath = input<string>('/');
+
+  private rendererService = inject(A2uiRendererService);
+  private injector = inject(EnvironmentInjector);
+
+  constructor() {
+    effect(() => {
+      const id = this.surfaceId();
+      if (this.rendererService.useUniversalComponents) {
+        const surface = this.rendererService.surfaceGroup.getSurface(id);
+        if (surface?.catalog) {
+          prepareUniversalCatalog(surface.catalog, this.injector);
+        }
+      }
+    });
+  }
 }

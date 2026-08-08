@@ -15,29 +15,64 @@
  */
 
 import {Component} from '@angular/core';
-import {ComponentApi} from '@a2ui/web_core/v0_9';
-import {createComponentImplementation} from './types';
-import {CatalogComponent} from '../core/catalog_component';
+import {AngularCatalog, createComponentImplementation} from './types';
+import {BASIC_COMPONENTS} from './basic/basic-catalog';
 import {z} from 'zod';
 
 @Component({
-  selector: 'test-comp',
-  template: '',
+  selector: 'test-custom-comp',
+  template: '<div>custom angular component</div>',
   standalone: true,
 })
-class TestComponent extends CatalogComponent<ComponentApi> {}
+class TestCustomComponent {}
 
-describe('createComponentImplementation', () => {
-  it('should map ComponentApi and Angular Component Type correctly', () => {
-    const api: ComponentApi = {
-      name: 'TestComp',
-      schema: z.object({}),
-    };
+describe('AngularCatalog & Catalog Types', () => {
+  it('instantiates empty AngularCatalog by default when no components are provided', () => {
+    const catalog = new AngularCatalog('https://example.com/catalog.json', []);
+    expect(catalog.id).toBe('https://example.com/catalog.json');
+    expect(catalog.components.size).toBe(0);
+    expect(catalog.functions.size).toBe(0);
+  });
 
-    const impl = createComponentImplementation(api, TestComponent);
+  it('instantiates AngularCatalog with components as a pure registry without injection context', () => {
+    const catalog = new AngularCatalog('test-catalog', [
+      {
+        name: 'CustomTest',
+        schema: z.object({}),
+        component: TestCustomComponent,
+      },
+    ]);
+    expect(catalog.components.size).toBe(1);
+    const comp = catalog.components.get('CustomTest');
+    expect(comp).toBeDefined();
+    expect('component' in comp! && comp.component).toBe(TestCustomComponent);
+  });
 
-    expect(impl.name).toBe('TestComp');
-    expect(impl.schema).toEqual(api.schema);
-    expect(impl.component).toBe(TestComponent);
+  it('exports BASIC_COMPONENTS with 18 native components by default', () => {
+    expect(BASIC_COMPONENTS.length).toBe(18);
+    const textComp = BASIC_COMPONENTS.find(c => c.name === 'Text');
+    expect(textComp).toBeDefined();
+    expect('component' in textComp! && textComp.component).toBeDefined();
+  });
+
+  it('creates an AngularComponentImplementation via createComponentImplementation', () => {
+    const schema = z.object({value: z.string()});
+    const impl = createComponentImplementation({name: 'CustomItem', schema}, TestCustomComponent);
+    expect(impl.name).toBe('CustomItem');
+    expect(impl.schema).toBe(schema);
+    expect(impl.component).toBe(TestCustomComponent);
+  });
+
+  it('preserves native AngularComponentImplementation without converting to Web Component', () => {
+    const catalog = new AngularCatalog('test-catalog', [
+      {
+        name: 'CustomNative',
+        schema: z.object({}),
+        component: TestCustomComponent,
+      },
+    ]);
+    const comp = catalog.components.get('CustomNative');
+    expect(comp).toBeDefined();
+    expect('component' in comp! && comp.component).toBe(TestCustomComponent);
   });
 });

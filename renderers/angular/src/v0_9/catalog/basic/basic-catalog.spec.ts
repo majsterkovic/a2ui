@@ -14,11 +14,27 @@
  * limitations under the License.
  */
 
+import {Component} from '@angular/core';
 import {TestBed} from '@angular/core/testing';
-import {BasicCatalog, BASIC_CATALOG_OPTIONS} from './basic-catalog';
+import {z} from 'zod';
+import {BasicCatalog} from './basic-catalog';
+import {AngularComponentImplementation} from '../types';
+
+@Component({
+  selector: 'test-custom-slider',
+  template: '<div>custom slider</div>',
+  standalone: true,
+})
+class TestCustomSliderComponent {}
+
+const customSliderDeclaration: AngularComponentImplementation = {
+  name: 'CustomSlider',
+  schema: z.object({}),
+  component: TestCustomSliderComponent,
+};
 
 describe('BasicCatalog', () => {
-  it('should be created with default options when no token is provided', () => {
+  it('should be created with default options', () => {
     TestBed.configureTestingModule({
       providers: [BasicCatalog],
     });
@@ -26,23 +42,34 @@ describe('BasicCatalog', () => {
     const catalog = TestBed.inject(BasicCatalog);
     expect(catalog).toBeTruthy();
     expect(catalog.id).toBe('https://a2ui.org/specification/v0_9/catalogs/basic/catalog.json');
+    const textComp = catalog.components.get('Text') as AngularComponentImplementation;
+    expect(textComp).toBeDefined();
+    expect(textComp.component).toBeDefined();
   });
 
-  it('should be created with custom options when token is provided', () => {
-    TestBed.configureTestingModule({
-      providers: [
-        BasicCatalog,
-        {
-          provide: BASIC_CATALOG_OPTIONS,
-          useValue: {
-            id: 'https://example.com/custom-catalog.json',
-          },
-        },
-      ],
+  it('should be created with custom options via constructor', () => {
+    const catalog = new BasicCatalog({
+      id: 'https://example.com/custom-catalog.json',
     });
 
-    const catalog = TestBed.inject(BasicCatalog);
     expect(catalog).toBeTruthy();
     expect(catalog.id).toBe('https://example.com/custom-catalog.json');
+  });
+
+  it('contains native component implementations in basic components', () => {
+    const catalog = new BasicCatalog();
+    const textComp = catalog.components.get('Text') as AngularComponentImplementation;
+    expect(textComp).toBeDefined();
+    expect(textComp.component).toBeDefined();
+  });
+
+  it('preserves AngularComponentImplementation in extraComponents', () => {
+    const catalog = new BasicCatalog({
+      extraComponents: [customSliderDeclaration],
+    });
+
+    expect(catalog.components.has('CustomSlider')).toBeTrue();
+    const comp = catalog.components.get('CustomSlider') as AngularComponentImplementation;
+    expect(comp.component).toBe(TestCustomSliderComponent);
   });
 });
