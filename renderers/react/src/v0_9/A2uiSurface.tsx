@@ -26,7 +26,7 @@
  * nodes.
  */
 
-import React, {memo, useCallback, useMemo, useSyncExternalStore} from 'react';
+import React, {memo, useCallback, useMemo, useSyncExternalStore, useRef, useEffect} from 'react';
 import {
   type ComponentNode,
   isComponentNode,
@@ -35,8 +35,11 @@ import {
   getValue,
   peekValue,
   type SurfaceModel,
+  type ComponentContext,
 } from '@a2ui/web_core/v0_9';
-import type {ReactComponentImplementation} from './adapter';
+import {basicCatalog as webCoreBasicCatalog} from '@a2ui/web_core/v0_9/basic_catalog';
+import type {ReactComponentImplementation, ReactCatalogComponent} from './adapter';
+import {useA2UI} from './core/A2UIProvider';
 import {
   LoadingPlaceholder,
   NodeSurfaceContext,
@@ -44,6 +47,42 @@ import {
   useNodeView,
   type NodeBuildChild,
 } from './node-view';
+
+const WebComponentNode = memo(
+  ({tagName, context}: {tagName: string; context: ComponentContext}) => {
+    const elRef = useRef<HTMLElement | null>(null);
+    const contextRef = useRef(context);
+    contextRef.current = context;
+
+    const setRef = useCallback((node: HTMLElement | null) => {
+      elRef.current = node;
+      if (node) {
+        (node as unknown as {context?: ComponentContext}).context = contextRef.current;
+      }
+    }, []);
+
+    useEffect(() => {
+      if (elRef.current) {
+        (elRef.current as unknown as {context?: ComponentContext}).context = context;
+      }
+    }, [context]);
+
+    return React.createElement(tagName, {ref: setRef});
+  },
+);
+WebComponentNode.displayName = 'WebComponentNode';
+
+const WebComponentFallback: React.FC<{
+  tagName: string;
+  node: ComponentNode<ReactCatalogComponent>;
+  buildChild: NodeBuildChild;
+}> = ({tagName, node, buildChild}) => {
+  const {context} = useNodeView(node as any, buildChild);
+  if (!context) {
+    return <LoadingPlaceholder componentId={node.componentId} />;
+  }
+  return <WebComponentNode tagName={tagName} context={context} />;
+};
 
 /** Renders an implementation that has no `view`: its wrapper binds itself. */
 const RenderFallback: React.FC<{
@@ -66,9 +105,10 @@ const NodeView = memo(
     surface,
     node,
   }: {
-    surface: SurfaceModel<ReactComponentImplementation>;
-    node: ComponentNode<ReactComponentImplementation>;
+    surface: SurfaceModel<ReactCatalogComponent>;
+    node: ComponentNode<ReactCatalogComponent>;
   }) => {
+    const {useUniversalComponents} = useA2UI();
     const buildChild = useCallback<NodeBuildChild>(
       (child, basePath) => {
         if (isComponentNode(child)) {
@@ -86,7 +126,7 @@ const NodeView = memo(
         return (
           <UnresolvedChildReference
             key={JSON.stringify([child, requested])}
-            surface={surface}
+            surface={surface as any}
             id={child}
             requestedPath={requested}
             detail={detail}
@@ -107,17 +147,45 @@ const NodeView = memo(
       // Type narrowing; unreachable for a resolved node.
       return null;
     }
-    const View = impl.view;
-    if (!View) {
-      return <RenderFallback node={node} impl={impl} buildChild={buildChild} />;
+
+    const hasViewOrRender = Boolean(
+      ('view' in impl && (impl as ReactComponentImplementation).view) ||
+      ('render' in impl && (impl as ReactComponentImplementation).render),
+    );
+    const preferUniversal =
+      useUniversalComponents || (!hasViewOrRender && 'tagName' in impl && !!impl.tagName);
+
+    if (preferUniversal) {
+      const universalComp =
+        'tagName' in impl && impl.tagName ? impl : webCoreBasicCatalog.components.get(node.type);
+      if (universalComp && 'tagName' in universalComp && universalComp.tagName) {
+        return (
+          <WebComponentFallback
+            tagName={universalComp.tagName}
+            node={node}
+            buildChild={buildChild}
+          />
+        );
+      }
     }
-    return <View node={node} buildChild={buildChild} />;
+
+    const View = (impl as ReactComponentImplementation).view;
+    if (!View) {
+      return (
+        <RenderFallback
+          node={node as any}
+          impl={impl as ReactComponentImplementation}
+          buildChild={buildChild}
+        />
+      );
+    }
+    return <View node={node as any} buildChild={buildChild} />;
   },
 );
 NodeView.displayName = 'NodeView';
 
 export const A2uiSurface: React.FC<{
-  surface: SurfaceModel<ReactComponentImplementation>;
+  surface: SurfaceModel<ReactCatalogComponent>;
 }> = ({surface}) => {
   // The resolver is created inside subscribe, which React calls only for
   // committed renders: a render that is discarded (concurrent mode,
@@ -127,13 +195,13 @@ export const A2uiSurface: React.FC<{
   // The factory reads nothing; the dependency exists to reset the box when
   // the surface is swapped.
   const box = useMemo(
-    () => ({resolver: undefined as NodeResolver<ReactComponentImplementation> | undefined}),
+    () => ({resolver: undefined as NodeResolver<ReactCatalogComponent> | undefined}),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [surface],
   );
   const subscribe = useCallback(
     (onChange: () => void) => {
-      const resolver = new NodeResolver(surface, surface.catalog);
+      const resolver = new NodeResolver(surface, surface.catalog as any);
       box.resolver = resolver;
       const stopEffect = effect(() => {
         getValue(resolver.rootNode);
@@ -159,7 +227,7 @@ export const A2uiSurface: React.FC<{
     return <LoadingPlaceholder componentId="root" />;
   }
   return (
-    <NodeSurfaceContext.Provider value={surface}>
+    <NodeSurfaceContext.Provider value={surface as any}>
       <NodeView surface={surface} node={root} />
     </NodeSurfaceContext.Provider>
   );

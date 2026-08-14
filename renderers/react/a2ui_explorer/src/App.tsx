@@ -17,18 +17,26 @@
 import {useState, useEffect, useSyncExternalStore, useCallback, useRef} from 'react';
 import {MessageProcessor, type SurfaceModel, type A2uiClientAction} from '@a2ui/web_core/v0_9';
 import {
-  basicCatalog,
   A2uiSurface,
+  A2UIProvider,
   MarkdownContext,
-  type ReactComponentImplementation,
+  type ReactCatalogComponent,
 } from '@a2ui/react/v0_9';
+import {demoCatalog} from './demo-catalog';
 import {getDemoItems} from './examples';
 import {renderMarkdown} from '@a2ui/markdown-it';
 import styles from './App.module.css';
 
 const demoItems = getDemoItems();
 
-const DataModelViewer = ({surface}: {surface: SurfaceModel<ReactComponentImplementation>}) => {
+function getUseUniversalComponents(): boolean {
+  if (typeof window === 'undefined') return false;
+  const params = new URLSearchParams(window.location.search);
+  const param = params.get('useUniversalComponent') || params.get('useUniversalComponents');
+  return param?.toLowerCase() === 'true';
+}
+
+const DataModelViewer = ({surface}: {surface: SurfaceModel<ReactCatalogComponent>}) => {
   const subscribeHook = useCallback(
     (callback: () => void) => {
       const bound = surface.dataModel.subscribe('/', callback);
@@ -65,6 +73,11 @@ export interface AppProps {
    * @internal @visibleForTesting
    */
   onAction?: (action: A2uiClientAction) => void;
+  /**
+   * Explicit toggle to force universal components mode.
+   * @internal @visibleForTesting
+   */
+  useUniversalComponents?: boolean;
 }
 
 /**
@@ -77,14 +90,13 @@ interface LogEntry {
   action: A2uiClientAction;
 }
 
-export const App = ({initialExampleId, onAction}: AppProps) => {
+export const App = ({initialExampleId, onAction, useUniversalComponents}: AppProps) => {
+  const isUniversal = useUniversalComponents ?? getUseUniversalComponents();
   const [selectedExampleId, setSelectedExampleId] = useState(initialExampleId ?? demoItems[0].id);
   const selectedItem = demoItems.find(e => e.id === selectedExampleId);
 
   const [logs, setLogs] = useState<LogEntry[]>([]);
-  const [processor, setProcessor] = useState<MessageProcessor<ReactComponentImplementation> | null>(
-    null,
-  );
+  const [processor, setProcessor] = useState<MessageProcessor<ReactCatalogComponent> | null>(null);
   const [surfaces, setSurfaces] = useState<string[]>([]);
   const [currentMessageIndex, setCurrentMessageIndex] = useState(-1);
 
@@ -200,8 +212,8 @@ export const App = ({initialExampleId, onAction}: AppProps) => {
         if (prevProcessor) {
           prevProcessor.model.dispose();
         }
-        const newProcessor = new MessageProcessor<ReactComponentImplementation>(
-          [basicCatalog],
+        const newProcessor = new MessageProcessor<ReactCatalogComponent>(
+          [demoCatalog],
           async (action: A2uiClientAction) => {
             setLogs(l => [...l, {time: new Date().toISOString(), action}]);
             if (onActionRef.current) {
@@ -291,6 +303,20 @@ export const App = ({initialExampleId, onAction}: AppProps) => {
             <h1 className={styles.h1}>A2UI React Explorer</h1>
             <p className={styles.subtitle}>Preview and interact with React components</p>
           </div>
+          {isUniversal && (
+            <span
+              style={{
+                fontSize: '11px',
+                background: '#0284c7',
+                color: '#fff',
+                padding: '2px 8px',
+                borderRadius: '9999px',
+                fontWeight: 600,
+              }}
+            >
+              Universal Components
+            </span>
+          )}
         </div>
         <div className={styles.stepperControls}>
           <span>
@@ -415,7 +441,9 @@ export const App = ({initialExampleId, onAction}: AppProps) => {
                 return (
                   <div key={surfaceId} style={{marginBottom: '2rem'}}>
                     <MarkdownContext.Provider value={renderMarkdown}>
-                      <A2uiSurface surface={surface} />
+                      <A2UIProvider useUniversalComponents={isUniversal}>
+                        <A2uiSurface surface={surface} />
+                      </A2UIProvider>
                     </MarkdownContext.Provider>
                   </div>
                 );
