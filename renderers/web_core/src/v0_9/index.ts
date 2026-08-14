@@ -59,7 +59,11 @@ export type {
   MarkdownRendererOptions,
   MarkdownRendererTagClassMap,
 } from './basic_catalog/context/markdown.js';
-export {markdown} from './basic_catalog/directives/directives.js';
+export {
+  markdown,
+  setDefaultMarkdownRenderer,
+  getDefaultMarkdownRenderer,
+} from './basic_catalog/directives/directives.js';
 
 export {
   type Signal,

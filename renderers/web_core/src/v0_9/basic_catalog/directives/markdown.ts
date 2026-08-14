@@ -20,6 +20,24 @@ import {AsyncDirective} from 'lit/async-directive.js';
 import {unsafeHTML} from 'lit/directives/unsafe-html.js';
 import type {MarkdownRenderer, MarkdownRendererOptions} from '../context/markdown.js';
 
+let globalDefaultMarkdownRenderer: MarkdownRenderer | undefined;
+
+/**
+ * Sets the global default markdown renderer for basic catalog text components.
+ * Host applications or renderer packages can register a renderer (e.g. from `@a2ui/markdown-it`)
+ * to automatically render markdown without explicit per-component context configuration.
+ */
+export function setDefaultMarkdownRenderer(renderer?: MarkdownRenderer): void {
+  globalDefaultMarkdownRenderer = renderer;
+}
+
+/**
+ * Gets the currently registered global default markdown renderer, if any.
+ */
+export function getDefaultMarkdownRenderer(): MarkdownRenderer | undefined {
+  return globalDefaultMarkdownRenderer;
+}
+
 class MarkdownDirective extends AsyncDirective {
   private lastValue: string | null = null;
   private lastRenderer: MarkdownRenderer | undefined = undefined;
@@ -29,51 +47,43 @@ class MarkdownDirective extends AsyncDirective {
     _part: Part,
     [value, markdownRenderer, markdownOptions]: DirectiveParameters<this>,
   ) {
+    const effectiveRenderer = markdownRenderer ?? globalDefaultMarkdownRenderer;
     const jsonTagClassMap = JSON.stringify(markdownOptions?.tagClassMap);
     if (
       this.lastValue === value &&
-      this.lastRenderer === markdownRenderer &&
+      this.lastRenderer === effectiveRenderer &&
       jsonTagClassMap === this.lastTagClassMap
     ) {
       return noChange;
     }
 
     this.lastValue = value;
-    this.lastRenderer = markdownRenderer;
+    this.lastRenderer = effectiveRenderer;
     this.lastTagClassMap = jsonTagClassMap;
-    return this.render(value, markdownRenderer, markdownOptions);
+    return this.render(value, effectiveRenderer, markdownOptions);
   }
-
-  private static defaultMarkdownWarningLogged = false;
 
   render(
     value: string,
     markdownRenderer?: MarkdownRenderer,
     markdownOptions?: MarkdownRendererOptions,
   ) {
-    if (markdownRenderer) {
-      const renderFn =
-        typeof markdownRenderer === 'function'
-          ? markdownRenderer
-          : (markdownRenderer as any)?.['render']?.bind(markdownRenderer);
-      if (renderFn) {
-        Promise.resolve(renderFn(value, markdownOptions)).then((renderedStr: string) => {
-          if (this.isConnected) {
-            this.setValue(unsafeHTML(renderedStr));
-          }
-        });
-        return html`<span class="no-markdown-renderer">${value}</span>`;
-      }
+    const effectiveRenderer = markdownRenderer ?? globalDefaultMarkdownRenderer;
+    const renderFn =
+      typeof effectiveRenderer === 'function'
+        ? effectiveRenderer
+        : (effectiveRenderer as any)?.['render']?.bind(effectiveRenderer);
+
+    if (renderFn) {
+      Promise.resolve(renderFn(value, markdownOptions)).then((renderedStr: string) => {
+        if (value !== this.lastValue) return;
+        if (this.isConnected) {
+          this.setValue(unsafeHTML(renderedStr));
+        }
+      });
+      return html`<span class="no-markdown-renderer">${value}</span>`;
     }
 
-    if (!MarkdownDirective.defaultMarkdownWarningLogged) {
-      console.warn(
-        '[MarkdownDirective]',
-        "can't render markdown because no markdown renderer is configured.\n",
-        'Use `@a2ui/markdown-it`, or your own markdown renderer.',
-      );
-      MarkdownDirective.defaultMarkdownWarningLogged = true;
-    }
     return html`<span class="no-markdown-renderer">${value}</span>`;
   }
 }

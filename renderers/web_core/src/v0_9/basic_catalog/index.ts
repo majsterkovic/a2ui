@@ -48,4 +48,8 @@ export type {
   MarkdownRendererOptions,
   MarkdownRendererTagClassMap,
 } from './context/markdown.js';
-export {markdown} from './directives/directives.js';
+export {
+  markdown,
+  setDefaultMarkdownRenderer,
+  getDefaultMarkdownRenderer,
+} from './directives/directives.js';
