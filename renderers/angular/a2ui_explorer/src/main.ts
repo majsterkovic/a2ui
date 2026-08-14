@@ -15,7 +15,11 @@
  */
 
 import {bootstrapApplication} from '@angular/platform-browser';
+import {setDefaultMarkdownRenderer} from '@a2ui/web_core/v0_9';
+import {renderMarkdown} from '@a2ui/markdown-it';
 import {appConfig} from './app/app.config';
 import {App} from './app/app';
+
+setDefaultMarkdownRenderer(renderMarkdown);
 
 bootstrapApplication(App, appConfig).catch(err => console.error(err));
