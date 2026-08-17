@@ -111,6 +111,8 @@ export interface WebComponentImplementation<
   readonly tagName: string;
 }
 
+export {createComponentImplementation} from './create_component_implementation.js';
+
 /**
  * Infers the schema type from a ComponentApi.
  *

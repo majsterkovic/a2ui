@@ -12,6 +12,7 @@
   - `Video`: Wrap video in `.a2ui-video-container` with fallback message for unsupported browsers.
   - `Image`: Remove default `width: 100%` constraint on `img` elements to preserve intrinsic aspect ratios and support explicit layout sizing.
   - `Modal`: Migrate from native `<dialog>` to an overlay container (`.a2ui-modal-overlay`, `.a2ui-modal-content`) managed with explicit `@state() isOpen` lifecycle tracking, standard backdrop theming (`--a2ui-modal-backdrop-bg`), accessible dialog ARIA attributes (`role="dialog"`, `aria-modal="true"`), and an accessible close button (`aria-label="Close"`).
+- (v0_9) Export `createComponentImplementation` from `@a2ui/lit/v0_9` and refactor all basic catalog component definitions to use `createComponentImplementation`. [#2313](https://github.com/a2ui-project/a2ui/pull/2313)
 - (v0_9) Migrate Basic Catalog components and surface rendering from Shadow DOM to Light DOM. [#2204](https://github.com/a2ui-project/a2ui/pull/2204)
 
 ## 0.10.3
