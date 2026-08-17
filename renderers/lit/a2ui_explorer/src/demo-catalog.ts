@@ -14,8 +14,16 @@
  * limitations under the License.
  */
 
-import {setDefaultMarkdownRenderer} from '@a2ui/web_core/v0_9';
-import {renderMarkdown} from '@a2ui/markdown-it';
-import './local-gallery.js';
+import {Catalog} from '@a2ui/web_core/v0_9';
+import {basicCatalog} from '@a2ui/lit/v0_9';
+import {customSliderComponent} from './custom-slider.js';
+import {customGridComponent} from './custom-grid.js';
 
-setDefaultMarkdownRenderer(renderMarkdown);
+/**
+ * A catalog specific to the demo, extending the basic catalog with custom components.
+ */
+export const demoCatalog = new Catalog(
+  basicCatalog.id,
+  [...Array.from(basicCatalog.components.values()), customSliderComponent, customGridComponent],
+  Array.from(basicCatalog.functions.values()),
+);
