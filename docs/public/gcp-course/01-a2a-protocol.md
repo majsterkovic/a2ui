@@ -14,21 +14,16 @@ W miarę wzrostu złożoności aplikacji pojedynczy agent napotyka bariery:
 * **Trudności w testowaniu i utrzymaniu:** Mały, wyspecjalizowany agent jest deterministyczny, łatwiejszy do przetestowania jednostkowego i niezależnego wdrażania.
 
 ```mermaid
-flowchart LR
-    subgraph Monolith [Podejście Monolityczne]
-        M1[Jeden Wielki Agent] --> T1[Narzędzie SQL]
-        M1 --> T2[Narzędzie Płatności]
-        M1 --> T3[Narzędzie E-mail]
-        M1 --> T4[Narzędzie CRM]
-    end
-
-    subgraph MultiAgent [Podejście A2A / Modułowe]
-        Orch[Agent Koordynator / Router] -->|A2A Request| AgSQL[Agent Analityczny]
-        Orch -->|A2A Request| AgPay[Agent Finansowy]
-        Orch -->|A2A Request| AgCRM[Agent Obsługi Klienta]
-        AgSQL --> T1
-        AgPay --> T2
-        AgCRM --> T4
+flowchart TD
+    subgraph MultiAgent [Architektura A2A: Zdecentralizowani Agenci]
+        Orch["🤖 Agent Koordynator"]
+        AgSQL["📊 Agent Bazy SQL"]
+        AgPay["💳 Agent Płatności"]
+        AgCRM["👥 Agent CRM"]
+        
+        Orch -->|"Protokół A2A"| AgSQL
+        Orch -->|"Protokół A2A"| AgPay
+        Orch -->|"Protokół A2A"| AgCRM
     end
 ```
 

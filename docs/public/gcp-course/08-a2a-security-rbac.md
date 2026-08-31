@@ -17,24 +17,20 @@ Zabezpieczenie komunikacji między Agentem A (Koordynatorem) a Agentem B (Wykona
 ```mermaid
 sequenceDiagram
     autonumber
-    participant Orch as Agent Koordynator (SA: orch-sa)
-    participant MS as GCP Metadata Server
-    participant GFE as Google Front End (Cloud Run IAM)
-    participant Sub as Agent Wykonawca (SA: sub-sa)
+    participant Orch as 🤖 Agent Koordynator
+    participant MS as 🔐 Metadata Server
+    participant GFE as 🛡️ Cloud Run IAM (GFE)
+    participant Sub as ⚙️ Agent Wykonawca
 
-    Note over Orch: Chce wywołać Agenta Wykonawcę
-    Orch->>MS: Żądanie OIDC ID Token dla Audience: https://sub-agent-url.run.app
-    MS-->>Orch: Podpisany token OIDC JWT (ważny 1h)
+    Orch->>MS: 1. Pobierz OIDC Token dla Agenta Wykonawcy
+    MS-->>Orch: 2. Zwróć podpisany token JWT
+    Orch->>GFE: 3. POST /a2a/v1/task z tokenem w nagłówku
     
-    Orch->>GFE: POST /a2a/v1/task [Nagłówek: Authorization: Bearer <ID_TOKEN>]
-    Note over GFE: GFE weryfikuje czy orch-sa posiada rolę roles/run.invoker
-    
-    alt Brak uprawnień IAM
-        GFE-->>Orch: 403 Forbidden (Odrzucone na brzegu sieci!)
-    else Uprawnienia poprawne
-        GFE->>Sub: Przekazanie zapytania do kontenera
-        Note over Sub: Agent B sprawdza claims tokena (RBAC narzędzi)
-        Sub-->>Orch: 200 OK + Wynik zadania A2A
+    alt Brak roli roles/run.invoker
+        GFE-->>Orch: 403 Forbidden (blokada na brzegu sieci)
+    else Autoryzacja poprawna
+        GFE->>Sub: 4. Przekaż zapytanie do kontenera
+        Sub-->>Orch: 5. Odpowiedź z wynikiem zadania A2A
     end
 ```
 

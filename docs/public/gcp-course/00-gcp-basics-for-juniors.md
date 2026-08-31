@@ -60,19 +60,12 @@ Rozróżniamy dwa rodzaje logowania na Twoim komputerze:
 Aby zrozumieć IAM, Service Accounts i RBAC, wyobraź sobie nowoczesny biurowiec korporacyjny:
 
 ```mermaid
-flowchart LR
-    subgraph OfficeAnalogy [Analogia: Biurowiec Firmowy]
-        Card[Plastikowa Karta Dostępu] --> Gate[Bramka Wejściowa]
-        Gate --> Room1[Pokój Ogólny: Otwarty]
-        Gate --> Room2[Serwerownia: Tylko Dział IT]
-        Gate --> Room3[Kasa Pancerna: Tylko Skarbnik]
+flowchart TD
+    subgraph Analogy [Analogia: Karta Biurowa]
+        Card["💳 Karta dostępu"] --> Gate["🚪 Bramka / Czytnik"] --> Room["🏢 Konkretny Pokój"]
     end
-
-    subgraph GCPAnalogy [Odpowiednik w Google Cloud]
-        SA[Konto Usługowe / Service Account] --> IAM[Cloud IAM Policy Engine]
-        IAM --> Res1[Cloud Run: Publiczny Frontend]
-        IAM --> Res2[Vertex AI: Modele Gemini]
-        IAM --> Res3[Secret Manager: Hasła i Klucze]
+    subgraph GCP [Odpowiednik w Google Cloud]
+        SA["🤖 Service Account"] --> IAM["🔐 Cloud IAM Policy"] --> Resource["📦 Zasób: Cloud Run / Vertex AI"]
     end
 ```
 

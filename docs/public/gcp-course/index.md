@@ -12,38 +12,13 @@ Poniższy diagram przedstawia pełny przepływ w produkcyjnym środowisku agento
 
 ```mermaid
 flowchart TD
-    subgraph Frontend [Warstwa Klienta]
-        U[Użytkownik / Przeglądarka] -->|Interakcja & JSON Events| R[Renderer A2UI: Web / React / Flutter]
-    end
-
-    subgraph GCP_Project [Projekt Google Cloud Platform]
-        subgraph Ingress [Warstwa Wejściowa]
-            R -->|Streaming SSE / WebSocket + OIDC Token| CR_Orch[Cloud Run: Agent Główny / Orchestrator]
-        end
-
-        subgraph Security [Zarządzanie Tożsamością i Dostępem - IAM]
-            SA_Orch[Service Account: orch-agent-sa] -.->|Attached Identity| CR_Orch
-            SA_Sub[Service Account: sub-agent-sa] -.->|Attached Identity| CR_Sub
-            IAM_Policy[IAM Roles & RBAC Policy] -.->|Autoryzacja wywołań| CR_Sub
-        end
-
-        subgraph Agents_A2A [Komunikacja A2A - Agent-to-Agent]
-            CR_Orch -->|Protokół A2A + OIDC ID Token| CR_Sub[Cloud Run: Agent Wykonawczy / Sub-Agent]
-        end
-
-        subgraph AI_Platform [Modele Językowe i Runtime]
-            CR_Orch -->|Vertex AI SDK| Gemini[Gemini Enterprise 1.5/2.0 / Vertex AI]
-            CR_Sub -->|Vertex AI SDK + Grounding| Gemini
-        end
-
-        subgraph Storage_Tools [Narzędzia i Stan]
-            CR_Orch -->|Zapis sesji| Firestore[(Cloud Firestore / Redis)]
-            CR_Sub -->|Pobieranie kluczy/konfiguracji| SM[Secret Manager]
-            CR_Sub -->|Narzędzia biznesowe| API[(Zewnętrzne API / Bazy Danych)]
-        end
-    end
-
-    CR_Orch -->|Strumień komponentów A2UI| R
+    User["👤 Użytkownik"] <-->|"A2UI (Interfejs JSON)"| Frontend["📱 Aplikacja / Renderer"]
+    Frontend <-->|"SSE / OIDC"| Orch["🤖 Agent Główny (Cloud Run)"]
+    Orch <-->|"A2A (Protokół Agentów)"| Sub["⚙️ Agent Wykonawczy (Cloud Run)"]
+    
+    Orch -->|"Modele LLM"| Vertex["🧠 Vertex AI (Gemini)"]
+    Sub -->|"Modele LLM"| Vertex
+    Sub -->|"Baza & Narzędzia"| Tools["🗄️ Baza Danych / API"]
 ```
 
 ---

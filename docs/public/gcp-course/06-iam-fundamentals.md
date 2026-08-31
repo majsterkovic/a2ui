@@ -13,10 +13,9 @@ W Google Cloud całe bezpieczeństwo sprowadza się do prostego równania:
 $$\text{KTO (Tożsamość)} + \text{CO MOŻE ZROBIĆ (Rola)} + \text{NA JAKIM ZASOBIE (Zasób)}$$
 
 ```mermaid
-flowchart LR
-    Principal[KTO: Principal / Tożsamość<br>np. Service Account agenta] -->|Posiada| Role[CO: Rola IAM<br>np. roles/aiplatform.user]
-    Role -->|Obejmuje| Perms[Zestaw Uprawnień<br>aiplatform.endpoints.predict]
-    Role -->|Przypisana do| Resource[GDZIE: Zasób GCP<br>Projekt / Usługa Cloud Run]
+flowchart TD
+    Principal["👤 KTO: Tożsamość (Service Account)"] --> Role["🔑 CO: Rola IAM (np. roles/aiplatform.user)"]
+    Role --> Resource["📦 GDZIE: Zasób (Usługa Cloud Run / Projekt)"]
 ```
 
 ### 1. KTO (Principal / Member)
@@ -87,13 +86,13 @@ Każdy komponent systemu agentowego powinien posiadać **wyłącznie te uprawnie
 
 ```mermaid
 flowchart TD
-    subgraph Bad [ZŁA PRAKTYKA: Zbyt szerokie uprawnienia]
-        A1[Agent Analityczny] -->|Rola: Editor| P1[Dostęp do Bazy + Płatności + Sieci + Logów]
+    subgraph Bad [❌ ZŁA PRAKTYKA: Rola Editor]
+        A1["🤖 Agent"] --> P1["Pełen dostęp: Baza + Finanse + Kasowanie"]
     end
 
-    subgraph Good [DOBRA PRAKTYKA: Zasada Najmniejszych Uprawnień]
-        A2[Agent Analityczny] -->|Rola: roles/datastore.viewer| DB[(Tylko Odczyt Bazy)]
-        A2 -->|Rola: roles/aiplatform.user| VAI[Vertex AI Gemini]
+    subgraph Good [✅ DOBRA PRAKTYKA: Zasada PoLP]
+        A2["🤖 Agent"] --> P2["Tylko odczyt: roles/datastore.viewer"]
+        A2 --> P3["Tylko Gemini: roles/aiplatform.user"]
     end
 ```
 

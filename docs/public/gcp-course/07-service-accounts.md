@@ -17,13 +17,8 @@ nazwa-konta@twoj-projekt-gcp.iam.gserviceaccount.com
 
 ```mermaid
 flowchart TD
-    subgraph HumanAuth [Logowanie Człowieka]
-        User[Programista: jan@firma.pl] -->|Hasło + 2FA / SSO| GCP1[Dostęp do Konsoli GCP]
-    end
-
-    subgraph ServiceAuth [Logowanie Maszyny / Agenta]
-        SA[Konto Usługowe: agent-runner-sa] -->|Krótkotrwały Token OIDC/OAuth2| GCP2[Cloud Run / Vertex AI / Firestore]
-    end
+    User["👤 Człowiek: login + hasło + 2FA"] --> GCP1["Dostęp do konsoli GCP"]
+    SA["🤖 Agent: Service Account + Token OIDC"] --> GCP2["Dostęp do Cloud Run / Gemini"]
 ```
 
 ---
@@ -49,15 +44,13 @@ Konta tworzone wewnętrznie przez Google w formacie `service-NUMER_PROJEKTU@gcp-
 Jednym z najczęstszych błędów początkujących inżynierów jest generowanie i pobieranie pliku klucza prywatnego w formacie JSON (`service-account-key.json`).
 
 ```mermaid
-flowchart LR
-    subgraph Danger [NIEBEZPIECZEŃSTWO: Statyczny plik JSON]
-        K[Klucz prywatny .json] --> Git[Przypadkowy commit na GitHub]
-        K --> Leak[Wyciek danych i przejęcie projektu]
+flowchart TD
+    subgraph Danger [❌ NIEBEZPIECZEŃSTWO: Statyczny plik JSON]
+        K["Klucz .json"] --> Git["Przypadkowy commit w Git"] --> Leak["Wyciek uprawnień"]
     end
 
-    subgraph Secure [BEZPIECZEŃSTWO: Dołączona tożsamość / Metadata Server]
-        CR[Kontener Cloud Run] -->|Automatyczne zapytanie| MS[Metadata Server GCP]
-        MS -->|Krótkotrwały token 1h| CR
+    subgraph Secure [✅ BEZPIECZEŃSTWO: Metadata Server]
+        CR["Kontener Cloud Run"] <-->|"Automatyczny token 1h"| MS["GCP Metadata Server"]
     end
 ```
 

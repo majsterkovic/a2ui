@@ -24,22 +24,17 @@ Protokół A2UI opiera się na ciągłej pętli synchronizacji stanu:
 ```mermaid
 sequenceDiagram
     autonumber
-    actor U as Użytkownik
-    participant R as Renderer A2UI (Frontend)
-    participant A as Agent AI (Cloud Run)
+    actor U as 👤 Użytkownik
+    participant R as 📱 Renderer A2UI
+    participant A as 🤖 Agent (Cloud Run)
 
-    U->>R: Wpisuje prompt: "Zarezerwuj spotkanie z klientem"
-    R->>A: Przesyła prompt użytkownika (REST/SSE)
-    Note over A: Model decyduje o wyświetleniu formularza
-    A-->>R: Strumieniuje A2UI: definicja komponentów + model danych
-    Note over R: Renderer dynamicznie buduje komponenty UI
-    R->>U: Wyświetla interaktywny formularz rezerwacji
-    U->>R: Wybiera datę i klika "Potwierdź"
-    Note over R: Aktualizacja stanu po ścieżce JSON Pointer (/form/date)
-    R->>A: Wysyła zdarzenie 'userAction' wraz z aktualnym stanem
-    Note over A: Agent wykonuje narzędzie w kalendarzu
-    A-->>R: Strumieniuje A2UI: karta z potwierdzeniem
-    R->>U: Wyświetla finalne podsumowanie
+    U->>R: 1. Wpisuje polecenie
+    R->>A: 2. Przesyła żądanie (REST/SSE)
+    A-->>R: 3. Strumieniuje komponenty A2UI JSON
+    R->>U: 4. Renderuje interaktywny formularz
+    U->>R: 5. Wypełnia formularz i klika przycisk
+    R->>A: 6. Wysyła zdarzenie 'userAction' ze stanem
+    A-->>R: 7. Odsyła zaktualizowany widok (potwierdzenie)
 ```
 
 ---

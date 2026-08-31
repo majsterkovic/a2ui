@@ -11,15 +11,13 @@ W tym module dowiesz się, jak działa Cloud Run, dlaczego idealnie pasuje do sy
 **Cloud Run** to w pełni zarządzana platforma bezserwerowa (Serverless), która uruchamia kontenery bez konieczności zarządzania klastrami maszyn wirtualnych (jak w Kubernetes/GKE) czy systemem operacyjnym.
 
 ```mermaid
-flowchart LR
-    Dev[Kod Agenta w Pythonie] -->|1. Dockerfile| Img[Obraz Kontenera]
-    Img -->|2. gcloud run deploy| CR[Google Cloud Run]
+flowchart TD
+    Code["🐍 Kod Agenta (Python)"] --> Build["🐳 Kontener Docker"]
+    Build --> Deploy["🚀 gcloud run deploy"]
     
-    subgraph CloudRunCluster [Skalowanie w Cloud Run]
-        CR -->|Ruch = 0 req/s| Zero[0 Instancji - Koszt 0 PLN]
-        CR -->|Ruch = 10 req/s| Inst1[Instancja 1]
-        CR -->|Ruch = 500 req/s| InstN[Instancja 1 ... N - Autoscale]
-    end
+    Deploy --> Scale["☁️ Cloud Run (Autoscaling)"]
+    Scale --> S0["Brak ruchu: 0 instancji (0 PLN)"]
+    Scale --> SN["Wzrost ruchu: 1...N instancji automatycznie"]
 ```
 
 ---

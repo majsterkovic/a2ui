@@ -12,20 +12,14 @@ W tym module dowiesz się, jak zbudowane jest środowisko uruchomieniowe agenta,
 
 ```mermaid
 flowchart TD
-    subgraph Runtime [Agent Runtime Environment]
-        E[Wejście: Prompt / Zdarzenie A2A / A2UI Action] --> P[1. Percepcja & Pobranie Pamięci]
-        P --> C[2. Budowa Kontekstu i Promptu]
-        C --> LLM[3. Model LLM / Gemini Enterprise]
-        LLM -->|Decyzja: Tool Call| T[4. Wykonanie Narzędzia / API / Baza]
-        T --> O[5. Obserwacja & Zapis Stanu do Bazy]
-        O -->|Kolejna iteracja| C
-        LLM -->|Decyzja: Odpowiedź Końcowa| R[6. Wygenerowanie A2UI / Zwrócenie Wyniku]
-    end
-
-    subgraph StateStore [Warstwa Danych]
-        Mem[(Cloud Firestore / Redis)] <--> P
-        Mem <--> O
-    end
+    Input["1. Wejście: Zdarzenie / Prompt"] --> MemRead["2. Odczyt Pamięci (Firestore)"]
+    MemRead --> Reason["3. Planowanie (Gemini Enterprise)"]
+    
+    Reason -->|Wywołanie narzędzia| Act["4. Wykonanie Narzędzia (API / Baza)"]
+    Act --> MemWrite["5. Zapis Obserwacji (Firestore)"]
+    MemWrite --> Reason
+    
+    Reason -->|Zakończenie pracy| Output["6. Odpowiedź / Komponenty A2UI"]
 ```
 
 Przykłady środowisk uruchomieniowych:

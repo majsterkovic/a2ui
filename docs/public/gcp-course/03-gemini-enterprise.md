@@ -39,14 +39,18 @@ Zmniejszenie zjawiska halucynacji osiąga się poprzez powiązanie modelu z wiar
 Model Gemini potrafi przetłumaczyć intencję użytkownika na wywołanie funkcji z ustrukturyzowanymi parametrami JSON. To fundament działania każdego agenta wykonawczego.
 
 ```mermaid
-flowchart LR
-    User[Zapytanie użytkownika] --> Agent[Agent na Cloud Run]
-    Agent -->|Prompt + Schemat Narzędzi| Vertex[Vertex AI: Gemini Model]
-    Vertex -->|Decyzja: Tool Call| Agent
-    Agent -->|Wykonanie zapytania| Tool[SQL / API / Baza danych]
-    Tool -->|Wynik narzędzia| Agent
-    Agent -->|Wynik + Kontekst| Vertex
-    Vertex -->|Ostateczna odpowiedź| Agent
+sequenceDiagram
+    autonumber
+    participant A as 🤖 Agent (Cloud Run)
+    participant V as 🧠 Vertex AI (Gemini)
+    participant T as 🗄️ Narzędzie (SQL / API)
+
+    A->>V: 1. Prompt + Schemat funkcji (Tools)
+    V-->>A: 2. Decyzja o wywołaniu funkcji get_data()
+    A->>T: 3. Wykonanie zapytania do bazy/API
+    T-->>A: 4. Zwrócenie surowych danych
+    A->>V: 5. Przekazanie wyniku narzędzia do modelu
+    V-->>A: 6. Ostateczna odpowiedź biznesowa
 ```
 
 ---
