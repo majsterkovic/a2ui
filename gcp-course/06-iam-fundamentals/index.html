@@ -1483,10 +1483,9 @@
 <h2 id="zota-formua-iam">Złota Formuła IAM<a class="headerlink" href="#zota-formua-iam" title="Permanent link">¶</a></h2>
 <p>W Google Cloud całe bezpieczeństwo sprowadza się do prostego równania:</p>
 <p>$$\text{KTO (Tożsamość)} + \text{CO MOŻE ZROBIĆ (Rola)} + \text{NA JAKIM ZASOBIE (Zasób)}$$</p>
-<pre class="mermaid"><code>flowchart LR
-    Principal[KTO: Principal / Tożsamość&lt;br&gt;np. Service Account agenta] --&gt;|Posiada| Role[CO: Rola IAM&lt;br&gt;np. roles/aiplatform.user]
-    Role --&gt;|Obejmuje| Perms[Zestaw Uprawnień&lt;br&gt;aiplatform.endpoints.predict]
-    Role --&gt;|Przypisana do| Resource[GDZIE: Zasób GCP&lt;br&gt;Projekt / Usługa Cloud Run]</code></pre>
+<pre class="mermaid"><code>flowchart TD
+    Principal["👤 KTO: Tożsamość (Service Account)"] --&gt; Role["🔑 CO: Rola IAM (np. roles/aiplatform.user)"]
+    Role --&gt; Resource["📦 GDZIE: Zasób (Usługa Cloud Run / Projekt)"]</code></pre>
 <h3 id="1-kto-principal-member">1. KTO (Principal / Member)<a class="headerlink" href="#1-kto-principal-member" title="Permanent link">¶</a></h3>
 <p>To podmiot żądający dostępu:
 * Konto użytkownika Google (<code>user:jan@firma.pl</code>),
@@ -1535,13 +1534,13 @@ Często w trakcie lokalnego debugowania pojawia się błąd <code>403 Permission
 <h2 id="zasada-najmniejszych-uprawnien-principle-of-least-privilege-polp">Zasada Najmniejszych Uprawnień (Principle of Least Privilege - PoLP)<a class="headerlink" href="#zasada-najmniejszych-uprawnien-principle-of-least-privilege-polp" title="Permanent link">¶</a></h2>
 <p>Każdy komponent systemu agentowego powinien posiadać <strong>wyłącznie te uprawnienia, które są absolutnie niezbędne</strong> do wykonania jego zadań, i ani jednego więcej.</p>
 <pre class="mermaid"><code>flowchart TD
-    subgraph Bad [ZŁA PRAKTYKA: Zbyt szerokie uprawnienia]
-        A1[Agent Analityczny] --&gt;|Rola: Editor| P1[Dostęp do Bazy + Płatności + Sieci + Logów]
+    subgraph Bad [❌ ZŁA PRAKTYKA: Rola Editor]
+        A1["🤖 Agent"] --&gt; P1["Pełen dostęp: Baza + Finanse + Kasowanie"]
     end
 
-    subgraph Good [DOBRA PRAKTYKA: Zasada Najmniejszych Uprawnień]
-        A2[Agent Analityczny] --&gt;|Rola: roles/datastore.viewer| DB[(Tylko Odczyt Bazy)]
-        A2 --&gt;|Rola: roles/aiplatform.user| VAI[Vertex AI Gemini]
+    subgraph Good [✅ DOBRA PRAKTYKA: Zasada PoLP]
+        A2["🤖 Agent"] --&gt; P2["Tylko odczyt: roles/datastore.viewer"]
+        A2 --&gt; P3["Tylko Gemini: roles/aiplatform.user"]
     end</code></pre>
 <hr/>
 <h2 id="warunki-iam-iam-conditions">Warunki IAM (IAM Conditions)<a class="headerlink" href="#warunki-iam-iam-conditions" title="Permanent link">¶</a></h2>

@@ -1400,19 +1400,12 @@
 <hr/>
 <h2 id="mentalny-model-bezpieczenstwa-analogia-do-biurowca">Mentalny Model Bezpieczeństwa: Analogia do Biurowca<a class="headerlink" href="#mentalny-model-bezpieczenstwa-analogia-do-biurowca" title="Permanent link">¶</a></h2>
 <p>Aby zrozumieć IAM, Service Accounts i RBAC, wyobraź sobie nowoczesny biurowiec korporacyjny:</p>
-<pre class="mermaid"><code>flowchart LR
-    subgraph OfficeAnalogy [Analogia: Biurowiec Firmowy]
-        Card[Plastikowa Karta Dostępu] --&gt; Gate[Bramka Wejściowa]
-        Gate --&gt; Room1[Pokój Ogólny: Otwarty]
-        Gate --&gt; Room2[Serwerownia: Tylko Dział IT]
-        Gate --&gt; Room3[Kasa Pancerna: Tylko Skarbnik]
+<pre class="mermaid"><code>flowchart TD
+    subgraph Analogy [Analogia: Karta Biurowa]
+        Card["💳 Karta dostępu"] --&gt; Gate["🚪 Bramka / Czytnik"] --&gt; Room["🏢 Konkretny Pokój"]
     end
-
-    subgraph GCPAnalogy [Odpowiednik w Google Cloud]
-        SA[Konto Usługowe / Service Account] --&gt; IAM[Cloud IAM Policy Engine]
-        IAM --&gt; Res1[Cloud Run: Publiczny Frontend]
-        IAM --&gt; Res2[Vertex AI: Modele Gemini]
-        IAM --&gt; Res3[Secret Manager: Hasła i Klucze]
+    subgraph GCP [Odpowiednik w Google Cloud]
+        SA["🤖 Service Account"] --&gt; IAM["🔐 Cloud IAM Policy"] --&gt; Resource["📦 Zasób: Cloud Run / Vertex AI"]
     end</code></pre>
 <ol>
 <li><strong>Pracownik (Człowiek):</strong> Loguje się do biura dowodem osobistym i hasłem.</li>

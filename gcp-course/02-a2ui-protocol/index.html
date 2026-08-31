@@ -1421,22 +1421,17 @@
 <p>Protokół A2UI opiera się na ciągłej pętli synchronizacji stanu:</p>
 <pre class="mermaid"><code>sequenceDiagram
     autonumber
-    actor U as Użytkownik
-    participant R as Renderer A2UI (Frontend)
-    participant A as Agent AI (Cloud Run)
+    actor U as 👤 Użytkownik
+    participant R as 📱 Renderer A2UI
+    participant A as 🤖 Agent (Cloud Run)
 
-    U-&gt;&gt;R: Wpisuje prompt: "Zarezerwuj spotkanie z klientem"
-    R-&gt;&gt;A: Przesyła prompt użytkownika (REST/SSE)
-    Note over A: Model decyduje o wyświetleniu formularza
-    A--&gt;&gt;R: Strumieniuje A2UI: definicja komponentów + model danych
-    Note over R: Renderer dynamicznie buduje komponenty UI
-    R-&gt;&gt;U: Wyświetla interaktywny formularz rezerwacji
-    U-&gt;&gt;R: Wybiera datę i klika "Potwierdź"
-    Note over R: Aktualizacja stanu po ścieżce JSON Pointer (/form/date)
-    R-&gt;&gt;A: Wysyła zdarzenie 'userAction' wraz z aktualnym stanem
-    Note over A: Agent wykonuje narzędzie w kalendarzu
-    A--&gt;&gt;R: Strumieniuje A2UI: karta z potwierdzeniem
-    R-&gt;&gt;U: Wyświetla finalne podsumowanie</code></pre>
+    U-&gt;&gt;R: 1. Wpisuje polecenie
+    R-&gt;&gt;A: 2. Przesyła żądanie (REST/SSE)
+    A--&gt;&gt;R: 3. Strumieniuje komponenty A2UI JSON
+    R-&gt;&gt;U: 4. Renderuje interaktywny formularz
+    U-&gt;&gt;R: 5. Wypełnia formularz i klika przycisk
+    R-&gt;&gt;A: 6. Wysyła zdarzenie 'userAction' ze stanem
+    A--&gt;&gt;R: 7. Odsyła zaktualizowany widok (potwierdzenie)</code></pre>
 <hr/>
 <h2 id="gowne-filary-protokou-a2ui">Główne filary protokołu A2UI<a class="headerlink" href="#gowne-filary-protokou-a2ui" title="Permanent link">¶</a></h2>
 <h3 id="1-spaszczona-lista-komponentow-component-adjacency-list">1. Spłaszczona lista komponentów (Component Adjacency List)<a class="headerlink" href="#1-spaszczona-lista-komponentow-component-adjacency-list" title="Permanent link">¶</a></h3>

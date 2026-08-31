@@ -1405,14 +1405,18 @@
 * <strong>Vertex AI Search (Enterprise Data Stores):</strong> Model automatycznie przeszukuje firmowe repozytoria dokumentów (pliki PDF na Google Cloud Storage, tabele w BigQuery czy bazy danych).</p>
 <h3 id="3-wywoywanie-narzedzi-function-calling-tool-use">3. Wywoływanie Narzędzi (Function Calling / Tool Use)<a class="headerlink" href="#3-wywoywanie-narzedzi-function-calling-tool-use" title="Permanent link">¶</a></h3>
 <p>Model Gemini potrafi przetłumaczyć intencję użytkownika na wywołanie funkcji z ustrukturyzowanymi parametrami JSON. To fundament działania każdego agenta wykonawczego.</p>
-<pre class="mermaid"><code>flowchart LR
-    User[Zapytanie użytkownika] --&gt; Agent[Agent na Cloud Run]
-    Agent --&gt;|Prompt + Schemat Narzędzi| Vertex[Vertex AI: Gemini Model]
-    Vertex --&gt;|Decyzja: Tool Call| Agent
-    Agent --&gt;|Wykonanie zapytania| Tool[SQL / API / Baza danych]
-    Tool --&gt;|Wynik narzędzia| Agent
-    Agent --&gt;|Wynik + Kontekst| Vertex
-    Vertex --&gt;|Ostateczna odpowiedź| Agent</code></pre>
+<pre class="mermaid"><code>sequenceDiagram
+    autonumber
+    participant A as 🤖 Agent (Cloud Run)
+    participant V as 🧠 Vertex AI (Gemini)
+    participant T as 🗄️ Narzędzie (SQL / API)
+
+    A-&gt;&gt;V: 1. Prompt + Schemat funkcji (Tools)
+    V--&gt;&gt;A: 2. Decyzja o wywołaniu funkcji get_data()
+    A-&gt;&gt;T: 3. Wykonanie zapytania do bazy/API
+    T--&gt;&gt;A: 4. Zwrócenie surowych danych
+    A-&gt;&gt;V: 5. Przekazanie wyniku narzędzia do modelu
+    V--&gt;&gt;A: 6. Ostateczna odpowiedź biznesowa</code></pre>
 <hr/>
 <h2 id="implementacja-w-pythonie-z-vertex-ai-sdk">Implementacja w Pythonie z Vertex AI SDK<a class="headerlink" href="#implementacja-w-pythonie-z-vertex-ai-sdk" title="Permanent link">¶</a></h2>
 <p>Poniższy kod demonstruje bezpieczne wywołanie modelu <code>gemini-1.5-flash</code> w regionie europejskim z wykorzystaniem tożsamości IAM (bez żadnych kluczy w kodzie!):</p>

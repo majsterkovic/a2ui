@@ -1448,15 +1448,13 @@
 <hr/>
 <h2 id="czym-jest-google-cloud-run">Czym jest Google Cloud Run?<a class="headerlink" href="#czym-jest-google-cloud-run" title="Permanent link">¶</a></h2>
 <p><strong>Cloud Run</strong> to w pełni zarządzana platforma bezserwerowa (Serverless), która uruchamia kontenery bez konieczności zarządzania klastrami maszyn wirtualnych (jak w Kubernetes/GKE) czy systemem operacyjnym.</p>
-<pre class="mermaid"><code>flowchart LR
-    Dev[Kod Agenta w Pythonie] --&gt;|1. Dockerfile| Img[Obraz Kontenera]
-    Img --&gt;|2. gcloud run deploy| CR[Google Cloud Run]
+<pre class="mermaid"><code>flowchart TD
+    Code["🐍 Kod Agenta (Python)"] --&gt; Build["🐳 Kontener Docker"]
+    Build --&gt; Deploy["🚀 gcloud run deploy"]
 
-    subgraph CloudRunCluster [Skalowanie w Cloud Run]
-        CR --&gt;|Ruch = 0 req/s| Zero[0 Instancji - Koszt 0 PLN]
-        CR --&gt;|Ruch = 10 req/s| Inst1[Instancja 1]
-        CR --&gt;|Ruch = 500 req/s| InstN[Instancja 1 ... N - Autoscale]
-    end</code></pre>
+    Deploy --&gt; Scale["☁️ Cloud Run (Autoscaling)"]
+    Scale --&gt; S0["Brak ruchu: 0 instancji (0 PLN)"]
+    Scale --&gt; SN["Wzrost ruchu: 1...N instancji automatycznie"]</code></pre>
 <hr/>
 <h2 id="dlaczego-cloud-run-jest-idealny-dla-agentow-ai">Dlaczego Cloud Run jest idealny dla Agentów AI?<a class="headerlink" href="#dlaczego-cloud-run-jest-idealny-dla-agentow-ai" title="Permanent link">¶</a></h2>
 <h3 id="1-skalowanie-od-zera-scale-to-zero">1. Skalowanie od Zera (Scale to Zero)<a class="headerlink" href="#1-skalowanie-od-zera-scale-to-zero" title="Permanent link">¶</a></h3>

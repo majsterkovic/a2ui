@@ -1478,13 +1478,8 @@
 <div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a href="#__codelineno-0-1" id="__codelineno-0-1" name="__codelineno-0-1"></a>nazwa-konta@twoj-projekt-gcp.iam.gserviceaccount.com
 </span></code></pre></div></p>
 <pre class="mermaid"><code>flowchart TD
-    subgraph HumanAuth [Logowanie Człowieka]
-        User[Programista: jan@firma.pl] --&gt;|Hasło + 2FA / SSO| GCP1[Dostęp do Konsoli GCP]
-    end
-
-    subgraph ServiceAuth [Logowanie Maszyny / Agenta]
-        SA[Konto Usługowe: agent-runner-sa] --&gt;|Krótkotrwały Token OIDC/OAuth2| GCP2[Cloud Run / Vertex AI / Firestore]
-    end</code></pre>
+    User["👤 Człowiek: login + hasło + 2FA"] --&gt; GCP1["Dostęp do konsoli GCP"]
+    SA["🤖 Agent: Service Account + Token OIDC"] --&gt; GCP2["Dostęp do Cloud Run / Gemini"]</code></pre>
 <hr/>
 <h2 id="rodzaje-kont-usugowych-w-gcp">Rodzaje Kont Usługowych w GCP<a class="headerlink" href="#rodzaje-kont-usugowych-w-gcp" title="Permanent link">¶</a></h2>
 <h3 id="1-konta-zarzadzane-przez-uzytkownika-user-managed-sa-standard-produkcyjny">1. Konta zarządzane przez użytkownika (User-Managed SA) – ✅ STANDARD PRODUKCYJNY<a class="headerlink" href="#1-konta-zarzadzane-przez-uzytkownika-user-managed-sa-standard-produkcyjny" title="Permanent link">¶</a></h3>
@@ -1499,15 +1494,13 @@
 <hr/>
 <h2 id="puapka-kluczy-json-vs-doaczone-konta-usugowe">Pułapka Kluczy JSON vs. Dołączone Konta Usługowe<a class="headerlink" href="#puapka-kluczy-json-vs-doaczone-konta-usugowe" title="Permanent link">¶</a></h2>
 <p>Jednym z najczęstszych błędów początkujących inżynierów jest generowanie i pobieranie pliku klucza prywatnego w formacie JSON (<code>service-account-key.json</code>).</p>
-<pre class="mermaid"><code>flowchart LR
-    subgraph Danger [NIEBEZPIECZEŃSTWO: Statyczny plik JSON]
-        K[Klucz prywatny .json] --&gt; Git[Przypadkowy commit na GitHub]
-        K --&gt; Leak[Wyciek danych i przejęcie projektu]
+<pre class="mermaid"><code>flowchart TD
+    subgraph Danger [❌ NIEBEZPIECZEŃSTWO: Statyczny plik JSON]
+        K["Klucz .json"] --&gt; Git["Przypadkowy commit w Git"] --&gt; Leak["Wyciek uprawnień"]
     end
 
-    subgraph Secure [BEZPIECZEŃSTWO: Dołączona tożsamość / Metadata Server]
-        CR[Kontener Cloud Run] --&gt;|Automatyczne zapytanie| MS[Metadata Server GCP]
-        MS --&gt;|Krótkotrwały token 1h| CR
+    subgraph Secure [✅ BEZPIECZEŃSTWO: Metadata Server]
+        CR["Kontener Cloud Run"] &lt;--&gt;|"Automatyczny token 1h"| MS["GCP Metadata Server"]
     end</code></pre>
 <h3 id="dlaczego-statyczne-klucze-json-sa-niebezpieczne">Dlaczego statyczne klucze JSON są niebezpieczne?<a class="headerlink" href="#dlaczego-statyczne-klucze-json-sa-niebezpieczne" title="Permanent link">¶</a></h3>
 <ol>

@@ -1459,21 +1459,16 @@
 * <strong>Zanieczyszczenie kontekstu (Context Dilution):</strong> Przekazanie modelowi dziesiątek narzędzi jednocześnie obniża precyzję wyboru właściwego narzędzia (<em>tool hallucination</em>).
 * <strong>Brak izolacji uprawnień:</strong> Jeśli jeden agent ma dostęp do bazy danych, płatności i wysyłki e-maili, każda luka w prompcie (<em>prompt injection</em>) może doprowadzić do nieautoryzowanych operacji.
 * <strong>Trudności w testowaniu i utrzymaniu:</strong> Mały, wyspecjalizowany agent jest deterministyczny, łatwiejszy do przetestowania jednostkowego i niezależnego wdrażania.</p>
-<pre class="mermaid"><code>flowchart LR
-    subgraph Monolith [Podejście Monolityczne]
-        M1[Jeden Wielki Agent] --&gt; T1[Narzędzie SQL]
-        M1 --&gt; T2[Narzędzie Płatności]
-        M1 --&gt; T3[Narzędzie E-mail]
-        M1 --&gt; T4[Narzędzie CRM]
-    end
+<pre class="mermaid"><code>flowchart TD
+    subgraph MultiAgent [Architektura A2A: Zdecentralizowani Agenci]
+        Orch["🤖 Agent Koordynator"]
+        AgSQL["📊 Agent Bazy SQL"]
+        AgPay["💳 Agent Płatności"]
+        AgCRM["👥 Agent CRM"]
 
-    subgraph MultiAgent [Podejście A2A / Modułowe]
-        Orch[Agent Koordynator / Router] --&gt;|A2A Request| AgSQL[Agent Analityczny]
-        Orch --&gt;|A2A Request| AgPay[Agent Finansowy]
-        Orch --&gt;|A2A Request| AgCRM[Agent Obsługi Klienta]
-        AgSQL --&gt; T1
-        AgPay --&gt; T2
-        AgCRM --&gt; T4
+        Orch --&gt;|"Protokół A2A"| AgSQL
+        Orch --&gt;|"Protokół A2A"| AgPay
+        Orch --&gt;|"Protokół A2A"| AgCRM
     end</code></pre>
 <hr/>
 <h2 id="topologie-komunikacji-agentowej">Topologie komunikacji agentowej<a class="headerlink" href="#topologie-komunikacji-agentowej" title="Permanent link">¶</a></h2>

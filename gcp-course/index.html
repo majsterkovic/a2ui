@@ -1206,38 +1206,13 @@
 <h2 id="architektura-referencyjna-systemu-agentowego-na-gcp">Architektura referencyjna systemu agentowego na GCP<a class="headerlink" href="#architektura-referencyjna-systemu-agentowego-na-gcp" title="Permanent link">¶</a></h2>
 <p>Poniższy diagram przedstawia pełny przepływ w produkcyjnym środowisku agentowym:</p>
 <pre class="mermaid"><code>flowchart TD
-    subgraph Frontend [Warstwa Klienta]
-        U[Użytkownik / Przeglądarka] --&gt;|Interakcja &amp; JSON Events| R[Renderer A2UI: Web / React / Flutter]
-    end
+    User["👤 Użytkownik"] &lt;--&gt;|"A2UI (Interfejs JSON)"| Frontend["📱 Aplikacja / Renderer"]
+    Frontend &lt;--&gt;|"SSE / OIDC"| Orch["🤖 Agent Główny (Cloud Run)"]
+    Orch &lt;--&gt;|"A2A (Protokół Agentów)"| Sub["⚙️ Agent Wykonawczy (Cloud Run)"]
 
-    subgraph GCP_Project [Projekt Google Cloud Platform]
-        subgraph Ingress [Warstwa Wejściowa]
-            R --&gt;|Streaming SSE / WebSocket + OIDC Token| CR_Orch[Cloud Run: Agent Główny / Orchestrator]
-        end
-
-        subgraph Security [Zarządzanie Tożsamością i Dostępem - IAM]
-            SA_Orch[Service Account: orch-agent-sa] -.-&gt;|Attached Identity| CR_Orch
-            SA_Sub[Service Account: sub-agent-sa] -.-&gt;|Attached Identity| CR_Sub
-            IAM_Policy[IAM Roles &amp; RBAC Policy] -.-&gt;|Autoryzacja wywołań| CR_Sub
-        end
-
-        subgraph Agents_A2A [Komunikacja A2A - Agent-to-Agent]
-            CR_Orch --&gt;|Protokół A2A + OIDC ID Token| CR_Sub[Cloud Run: Agent Wykonawczy / Sub-Agent]
-        end
-
-        subgraph AI_Platform [Modele Językowe i Runtime]
-            CR_Orch --&gt;|Vertex AI SDK| Gemini[Gemini Enterprise 1.5/2.0 / Vertex AI]
-            CR_Sub --&gt;|Vertex AI SDK + Grounding| Gemini
-        end
-
-        subgraph Storage_Tools [Narzędzia i Stan]
-            CR_Orch --&gt;|Zapis sesji| Firestore[(Cloud Firestore / Redis)]
-            CR_Sub --&gt;|Pobieranie kluczy/konfiguracji| SM[Secret Manager]
-            CR_Sub --&gt;|Narzędzia biznesowe| API[(Zewnętrzne API / Bazy Danych)]
-        end
-    end
-
-    CR_Orch --&gt;|Strumień komponentów A2UI| R</code></pre>
+    Orch --&gt;|"Modele LLM"| Vertex["🧠 Vertex AI (Gemini)"]
+    Sub --&gt;|"Modele LLM"| Vertex
+    Sub --&gt;|"Baza &amp; Narzędzia"| Tools["🗄️ Baza Danych / API"]</code></pre>
 <hr/>
 <h2 id="program-kursu">Program kursu<a class="headerlink" href="#program-kursu" title="Permanent link">¶</a></h2>
 <p>Kurs składa się z 8 modułów merytorycznych, ułożonych w logiczną ścieżkę od protokołów komunikacyjnych, przez infrastrukturę AI i konteneryzację, aż po bezpieczeństwo i kontrolę uprawnień.</p>

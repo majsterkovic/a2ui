@@ -1395,20 +1395,14 @@
 <h2 id="czym-jest-agent-runtime">Czym jest Agent Runtime?<a class="headerlink" href="#czym-jest-agent-runtime" title="Permanent link">¶</a></h2>
 <p><strong>Agent Runtime</strong> to warstwa oprogramowania (harness), która otacza model językowy i zarządza jego cyklem życia:</p>
 <pre class="mermaid"><code>flowchart TD
-    subgraph Runtime [Agent Runtime Environment]
-        E[Wejście: Prompt / Zdarzenie A2A / A2UI Action] --&gt; P[1. Percepcja &amp; Pobranie Pamięci]
-        P --&gt; C[2. Budowa Kontekstu i Promptu]
-        C --&gt; LLM[3. Model LLM / Gemini Enterprise]
-        LLM --&gt;|Decyzja: Tool Call| T[4. Wykonanie Narzędzia / API / Baza]
-        T --&gt; O[5. Obserwacja &amp; Zapis Stanu do Bazy]
-        O --&gt;|Kolejna iteracja| C
-        LLM --&gt;|Decyzja: Odpowiedź Końcowa| R[6. Wygenerowanie A2UI / Zwrócenie Wyniku]
-    end
+    Input["1. Wejście: Zdarzenie / Prompt"] --&gt; MemRead["2. Odczyt Pamięci (Firestore)"]
+    MemRead --&gt; Reason["3. Planowanie (Gemini Enterprise)"]
 
-    subgraph StateStore [Warstwa Danych]
-        Mem[(Cloud Firestore / Redis)] &lt;--&gt; P
-        Mem &lt;--&gt; O
-    end</code></pre>
+    Reason --&gt;|Wywołanie narzędzia| Act["4. Wykonanie Narzędzia (API / Baza)"]
+    Act --&gt; MemWrite["5. Zapis Obserwacji (Firestore)"]
+    MemWrite --&gt; Reason
+
+    Reason --&gt;|Zakończenie pracy| Output["6. Odpowiedź / Komponenty A2UI"]</code></pre>
 <p>Przykłady środowisk uruchomieniowych:
 * <strong>Google Agent Development Kit (ADK):</strong> Oficjalny framework do budowy i orkiestracji agentów wspierający protokoły A2A i A2UI.
 * <strong>Vertex AI Agent Engine:</strong> Zarządzana usługa w chmurze GCP do uruchamiania i hostowania agentów w architekturze bezserwerowej.
