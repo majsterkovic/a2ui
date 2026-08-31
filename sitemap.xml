@@ -65,6 +65,46 @@
          <lastmod>2026-08-31</lastmod>
     </url>
     <url>
+         <loc>https://a2ui.org/gcp-course/</loc>
+         <lastmod>2026-08-31</lastmod>
+    </url>
+    <url>
+         <loc>https://a2ui.org/gcp-course/00-gcp-basics-for-juniors/</loc>
+         <lastmod>2026-08-31</lastmod>
+    </url>
+    <url>
+         <loc>https://a2ui.org/gcp-course/01-a2a-protocol/</loc>
+         <lastmod>2026-08-31</lastmod>
+    </url>
+    <url>
+         <loc>https://a2ui.org/gcp-course/02-a2ui-protocol/</loc>
+         <lastmod>2026-08-31</lastmod>
+    </url>
+    <url>
+         <loc>https://a2ui.org/gcp-course/03-gemini-enterprise/</loc>
+         <lastmod>2026-08-31</lastmod>
+    </url>
+    <url>
+         <loc>https://a2ui.org/gcp-course/04-agent-runtime/</loc>
+         <lastmod>2026-08-31</lastmod>
+    </url>
+    <url>
+         <loc>https://a2ui.org/gcp-course/05-cloud-run/</loc>
+         <lastmod>2026-08-31</lastmod>
+    </url>
+    <url>
+         <loc>https://a2ui.org/gcp-course/06-iam-fundamentals/</loc>
+         <lastmod>2026-08-31</lastmod>
+    </url>
+    <url>
+         <loc>https://a2ui.org/gcp-course/07-service-accounts/</loc>
+         <lastmod>2026-08-31</lastmod>
+    </url>
+    <url>
+         <loc>https://a2ui.org/gcp-course/08-a2a-security-rbac/</loc>
+         <lastmod>2026-08-31</lastmod>
+    </url>
+    <url>
          <loc>https://a2ui.org/guides/a2ui-in-mcp-apps/</loc>
          <lastmod>2026-08-31</lastmod>
     </url>
@@ -182,46 +222,6 @@
     </url>
     <url>
          <loc>https://a2ui.org/specification/v1.0-evolution-guide/</loc>
-         <lastmod>2026-08-31</lastmod>
-    </url>
-    <url>
-         <loc>https://a2ui.org/specification/proposals/eval_suite_expansion/</loc>
-         <lastmod>2026-08-31</lastmod>
-    </url>
-    <url>
-         <loc>https://a2ui.org/specification/proposals/spec_driven_development/</loc>
-         <lastmod>2026-08-31</lastmod>
-    </url>
-    <url>
-         <loc>https://a2ui.org/specification/proposals/user_initiated_functions/</loc>
-         <lastmod>2026-08-31</lastmod>
-    </url>
-    <url>
-         <loc>https://a2ui.org/specification/proposals/atom/a2ui_atom/</loc>
-         <lastmod>2026-08-31</lastmod>
-    </url>
-    <url>
-         <loc>https://a2ui.org/specification/proposals/elemental/a2ui_elemental/</loc>
-         <lastmod>2026-08-31</lastmod>
-    </url>
-    <url>
-         <loc>https://a2ui.org/specification/proposals/elemental/implementation_plan/</loc>
-         <lastmod>2026-08-31</lastmod>
-    </url>
-    <url>
-         <loc>https://a2ui.org/specification/proposals/express/</loc>
-         <lastmod>2026-08-31</lastmod>
-    </url>
-    <url>
-         <loc>https://a2ui.org/specification/proposals/express/a2ui_express/</loc>
-         <lastmod>2026-08-31</lastmod>
-    </url>
-    <url>
-         <loc>https://a2ui.org/specification/proposals/express/create_surface_design/</loc>
-         <lastmod>2026-08-31</lastmod>
-    </url>
-    <url>
-         <loc>https://a2ui.org/specification/proposals/express/express_dsl_examples/</loc>
          <lastmod>2026-08-31</lastmod>
     </url>
 </urlset>
