@@ -1345,7 +1345,7 @@
 <svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"></path></svg>
 </a>
 <h1 id="przewodnik-startowy-jak-myslec-o-google-cloud-dla-poczatkujacych">Przewodnik Startowy: Jak myśleć o Google Cloud (Dla Początkujących)<a class="headerlink" href="#przewodnik-startowy-jak-myslec-o-google-cloud-dla-poczatkujacych" title="Permanent link">¶</a></h1>
-<p>Jeśli dopiero zaczynasz swoją przygodę z Google Cloud Platform (GCP) i sztuczną inteligencją opartą na agentach, wiele pojęć chmurowych może wydawać się przytłaczających. Ten rozdział to Twój <strong>słowniczek i mapa mentalna</strong>, która pozwoli Ci pewnie poruszać się po kolejnych modułach.</p>
+<p>Jeśli dopiero zaczynasz swoją przygodę z Google Cloud Platform (GCP) i sztuczną inteligencją opartą na agentach, wiele pojęć chmurowych może wydawać się przytłaczających. Ten rozdział to Twój <strong>słowniczek i mapa mentalna</strong>, które pozwolą Ci pewnie poruszać się po kolejnych modułach.</p>
 <hr/>
 <h2 id="czym-wasciwie-jest-google-cloud-platform-gcp">Czym właściwie jest Google Cloud Platform (GCP)?<a class="headerlink" href="#czym-wasciwie-jest-google-cloud-platform-gcp" title="Permanent link">¶</a></h2>
 <p>GCP to zestaw setek gotowych usług obliczeniowych, bazodanowych, sieciowych i modeli AI działających w centrach danych Google na całym świecie. </p>
@@ -1417,7 +1417,7 @@
 <h2 id="5-zotych-zasad-dla-junior-developera-w-gcp">5 Złotych Zasad dla Junior Developera w GCP<a class="headerlink" href="#5-zotych-zasad-dla-junior-developera-w-gcp" title="Permanent link">¶</a></h2>
 <ol>
 <li><strong>Nigdy nie używaj roli <code>Owner</code> ani <code>Editor</code> dla aplikacji:</strong> Zawsze szukaj roli predefiniowanej (np. <code>roles/aiplatform.user</code>).</li>
-<li><strong>Nigdy nie pobieraj kluczy prywatnych <code>.json</code> na swój komputer:</strong> Używaj <code>gcloud auth application-default login --impersonate-service-account</code>.</li>
+<li><strong>Nigdy nie pobieraj kluczy prywatnych <code>.json</code> na swój komputer:</strong> Używaj <code>gcloud auth application-default login --impersonate-service-account=NAZWA_SA@TWOJ_PROJEKT.iam.gserviceaccount.com</code>.</li>
 <li><strong>Pamiętaj o zmiennej środowiskowej <code>$PORT</code> w Cloud Run:</strong> Twój serwer w kontenerze <strong>musi</strong> nasłuchiwać na porcie podanym w zmiennej <code>$PORT</code> (domyślnie <code>8080</code>) i na adresie <code>0.0.0.0</code> (a nie <code>127.0.0.1</code>).</li>
 <li><strong>Zawsze konfiguruj limity czasu (Timeouts):</strong> Wywołania modeli LLM trwają dłużej niż standardowe zapytania REST (ustaw timeout na minimum 30-60 sekund).</li>
 <li><strong>Śledź koszty:</strong> Wykorzystaj mechanizm <em>Scale-to-Zero</em> w Cloud Run oraz darmowe pakiety (Free Tier) w GCP.</li>
