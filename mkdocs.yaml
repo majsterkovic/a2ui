@@ -64,6 +64,17 @@ nav:
           - A2UI over MCP: guides/a2ui_over_mcp.md
           - MCP Apps in A2UI: guides/mcp-apps-in-a2ui.md
           - A2UI in MCP Apps: guides/a2ui-in-mcp-apps.md
+  - Kurs GCP & Agenci AI:
+      - Spis Treści & Architektura: gcp-course/index.md
+      - 0. Przewodnik Startowy dla Juniora: gcp-course/00-gcp-basics-for-juniors.md
+      - 1. Protokół A2A (Agent-to-Agent): gcp-course/01-a2a-protocol.md
+      - 2. Interfejs A2UI (Agent-to-User): gcp-course/02-a2ui-protocol.md
+      - 3. Gemini Enterprise & Vertex AI: gcp-course/03-gemini-enterprise.md
+      - 4. Agent Runtime & Pętla Decyzyjna: gcp-course/04-agent-runtime.md
+      - 5. Wdrażanie na Cloud Run: gcp-course/05-cloud-run.md
+      - 6. IAM w Google Cloud: gcp-course/06-iam-fundamentals.md
+      - 7. Service Accounts w Praktyce: gcp-course/07-service-accounts.md
+      - 8. Bezpieczeństwo i RBAC dla A2A: gcp-course/08-a2a-security-rbac.md
   - Reference:
       - Component Gallery: reference/components.md
       - Message Reference: reference/messages.md
