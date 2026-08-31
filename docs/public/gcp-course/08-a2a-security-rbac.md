@@ -22,15 +22,15 @@ sequenceDiagram
     participant GFE as 🛡️ Cloud Run IAM (GFE)
     participant Sub as ⚙️ Agent Wykonawca
 
-    Orch->>MS: 1. Pobierz OIDC Token dla Agenta Wykonawcy
-    MS-->>Orch: 2. Zwróć podpisany token JWT
-    Orch->>GFE: 3. POST /a2a/v1/task z tokenem w nagłówku
+    Orch->>MS: Pobierz OIDC Token dla Agenta Wykonawcy
+    MS-->>Orch: Zwróć podpisany token JWT
+    Orch->>GFE: POST /a2a/v1/task z tokenem w nagłówku
     
     alt Brak roli roles/run.invoker
         GFE-->>Orch: 403 Forbidden (blokada na brzegu sieci)
     else Autoryzacja poprawna
-        GFE->>Sub: 4. Przekaż zapytanie do kontenera
-        Sub-->>Orch: 5. Odpowiedź z wynikiem zadania A2A
+        GFE->>Sub: Przekaż zapytanie do kontenera
+        Sub-->>Orch: Odpowiedź z wynikiem zadania A2A
     end
 ```
 
@@ -89,7 +89,6 @@ Biblioteka `google-auth` udostępnia moduł `id_token` do automatycznego pobiera
 import httpx
 from google.oauth2 import id_token
 from google.auth.transport.requests import Request
-import google.auth
 
 # Docelowy URL Agenta Wykonawcy (Audience)
 TARGET_AUDIENCE = "https://database-agent-xyz-uc.a.run.app"
@@ -134,6 +133,9 @@ from google.auth.transport.requests import Request
 
 app = FastAPI(title="Secure DB Agent with Tool-level RBAC")
 
+# URL tego serwisu Cloud Run — musi odpowiadać audience w tokenie OIDC
+EXPECTED_AUDIENCE = "https://database-agent-xyz-uc.a.run.app"
+
 # Macierz uprawnień narzędzi wg Service Accountów
 TOOL_PERMISSIONS = {
     "read_metrics": [
@@ -153,7 +155,8 @@ def verify_caller_identity(authorization: str = Header(...)) -> str:
     raw_token = authorization.split(" ")[1]
     try:
         # Weryfikacja tokena z kluczami publicznymi Google
-        claims = id_token.verify_oauth2_token(raw_token, Request())
+        # WAŻNE: Zawsze waliduj audience, aby zapobiec atakom token replay!
+        claims = id_token.verify_oauth2_token(raw_token, Request(), audience=EXPECTED_AUDIENCE)
         caller_email = claims.get("email")
         return caller_email
     except Exception as e:

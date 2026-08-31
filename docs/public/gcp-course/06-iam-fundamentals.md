@@ -117,7 +117,7 @@ gcloud projects add-iam-policy-binding TWOJ_PROJEKT_ID \
 
 ## Podsumowanie
 
-1. **Zasada złotego środka:** Nigdy nie używaj roli `Editor` ani `Owner` dla kont maszynowych w aplikacjach produkcyjnych.
+1. **Złota zasada bezpieczeństwa:** Nigdy nie używaj roli `Editor` ani `Owner` dla kont maszynowych w aplikacjach produkcyjnych.
 2. **Predefiniowane role:** Zawsze wybieraj dedykowaną rolę (np. `roles/run.invoker`, `roles/aiplatform.user`).
 3. **Izolacja:** Ograniczaj zakres roli do pojedynczego zasobu zamiast całego projektu, gdy tylko jest to możliwe.
 

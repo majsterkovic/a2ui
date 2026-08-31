@@ -25,10 +25,10 @@ Dla początkującego inżyniera kluczowe jest zrozumienie różnicy między śro
 
 ### 1. Bezpieczeństwo i Filtry Bezpieczeństwa (Safety Settings)
 W środowisku produkcyjnym agent nie może generować treści naruszających zasady organizacji. Vertex AI pozwala na precyzyjne ustawienie progów blokowania dla czterech kategorii:
-* Mowa nienawiści (*Hate Speech*)
-* Treści niebezpieczne (*Dangerous Content*)
-* Treści o charakterze seksualnym (*Harassment / Sexually Explicit*)
-* Podatności i ataki (*Cyberattacks / Security Violations*)
+* Mowa nienawiści (*Hate Speech* - `HARM_CATEGORY_HATE_SPEECH`)
+* Treści niebezpieczne (*Dangerous Content* - `HARM_CATEGORY_DANGEROUS_CONTENT`)
+* Nękanie (*Harassment* - `HARM_CATEGORY_HARASSMENT`)
+* Treści o charakterze seksualnym (*Sexually Explicit* - `HARM_CATEGORY_SEXUALLY_EXPLICIT`)
 
 ### 2. Uziemienie Danych (Grounding & RAG)
 Zmniejszenie zjawiska halucynacji osiąga się poprzez powiązanie modelu z wiarygodnymi źródłami wiedzy:
@@ -45,12 +45,12 @@ sequenceDiagram
     participant V as 🧠 Vertex AI (Gemini)
     participant T as 🗄️ Narzędzie (SQL / API)
 
-    A->>V: 1. Prompt + Schemat funkcji (Tools)
-    V-->>A: 2. Decyzja o wywołaniu funkcji get_data()
-    A->>T: 3. Wykonanie zapytania do bazy/API
-    T-->>A: 4. Zwrócenie surowych danych
-    A->>V: 5. Przekazanie wyniku narzędzia do modelu
-    V-->>A: 6. Ostateczna odpowiedź biznesowa
+    A->>V: Prompt + Schemat funkcji (Tools)
+    V-->>A: Decyzja o wywołaniu funkcji get_data()
+    A->>T: Wykonanie zapytania do bazy/API
+    T-->>A: Zwrócenie surowych danych
+    A->>V: Przekazanie wyniku narzędzia do modelu
+    V-->>A: Ostateczna odpowiedź biznesowa
 ```
 
 ---
@@ -66,8 +66,6 @@ from vertexai.generative_models import (
     GenerationConfig,
     HarmCategory,
     HarmBlockThreshold,
-    Tool,
-    grounding
 )
 
 # 1. Inicjalizacja Vertex AI (wykorzystuje automatyczną tożsamość Service Account)
@@ -144,8 +142,8 @@ model_with_tools = GenerativeModel(
 response = model_with_tools.generate_content("Ile kosztuje dzisiaj 100 EUR w PLN?")
 
 # Sprawdzenie czy model zażądał wywołania funkcji
-if response.candidates[0].function_calls:
-    tool_call = response.candidates[0].function_calls[0]
+if response.function_calls:
+    tool_call = response.function_calls[0]
     print(f"Model wybrał narzędzie: {tool_call.name}")
     print(f"Parametry: {dict(tool_call.args)}")
 ```

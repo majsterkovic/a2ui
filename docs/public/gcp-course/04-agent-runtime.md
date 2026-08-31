@@ -52,16 +52,16 @@ Rozróżniamy dwa rodzaje pamięci:
 ### 1. Pamięć Krótkoterminowa (Short-Term / Session Memory)
 Przechowuje historię bieżącej konwersacji (ostatnie wiadomości, bufor zmiennych).
 * **Technologia w GCP:** Google Cloud Firestore lub Memorystore (Redis).
-* **Struktura rekordu:**
+* **Struktura rekordu** (z rolami w konwencji Vertex AI Gemini — `user` i `model`):
   ```json
   {
     "conversation_id": "conv_9988-aabb",
     "user_id": "user_123",
     "history": [
-      {"role": "user", "content": "Ile wynosi limit kredytowy dla klienta ABC?"},
-      {"role": "assistant", "content": null, "tool_call": "fetch_client_limit"},
-      {"role": "tool", "content": "{\"limit\": 50000, \"currency\": \"PLN\"}"},
-      {"role": "assistant", "content": "Limit kredytowy dla klienta ABC wynosi 50 000 PLN."}
+      {"role": "user", "parts": [{"text": "Ile wynosi limit kredytowy dla klienta ABC?"}]},
+      {"role": "model", "parts": [{"function_call": {"name": "fetch_client_limit", "args": {"client": "ABC"}}}]},
+      {"role": "user", "parts": [{"function_response": {"name": "fetch_client_limit", "response": {"limit": 50000, "currency": "PLN"}}}]},
+      {"role": "model", "parts": [{"text": "Limit kredytowy dla klienta ABC wynosi 50 000 PLN."}]}
     ],
     "last_updated": "2026-08-31T22:05:00Z"
   }
@@ -84,12 +84,12 @@ MAX_ITERATIONS = 5
 
 for iteration in range(MAX_ITERATIONS):
     response = model.generate_content(...)
-    if not response.tool_calls:
+    if not response.function_calls:
         # Agent zakończył pracę i zwrócił odpowiedź
         return response.text
     # Wykonaj narzędzie...
 else:
-    raise TimeoutError("Agent przekroczył maksymalną liczbę iteracji planowania.")
+    raise RuntimeError("Agent przekroczył maksymalną liczbę iteracji planowania.")
 ```
 
 ### 2. Punkty Kontrolne z Udziałem Człowieka (Human-in-the-Loop - HITL)

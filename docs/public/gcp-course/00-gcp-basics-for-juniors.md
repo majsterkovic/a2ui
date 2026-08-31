@@ -1,6 +1,6 @@
 # Przewodnik Startowy: Jak myśleć o Google Cloud (Dla Początkujących)
 
-Jeśli dopiero zaczynasz swoją przygodę z Google Cloud Platform (GCP) i sztuczną inteligencją opartą na agentach, wiele pojęć chmurowych może wydawać się przytłaczających. Ten rozdział to Twój **słowniczek i mapa mentalna**, która pozwoli Ci pewnie poruszać się po kolejnych modułach.
+Jeśli dopiero zaczynasz swoją przygodę z Google Cloud Platform (GCP) i sztuczną inteligencją opartą na agentach, wiele pojęć chmurowych może wydawać się przytłaczających. Ten rozdział to Twój **słowniczek i mapa mentalna**, które pozwolą Ci pewnie poruszać się po kolejnych modułach.
 
 ---
 
@@ -79,7 +79,7 @@ flowchart TD
 ## 5 Złotych Zasad dla Junior Developera w GCP
 
 1. **Nigdy nie używaj roli `Owner` ani `Editor` dla aplikacji:** Zawsze szukaj roli predefiniowanej (np. `roles/aiplatform.user`).
-2. **Nigdy nie pobieraj kluczy prywatnych `.json` na swój komputer:** Używaj `gcloud auth application-default login --impersonate-service-account`.
+2. **Nigdy nie pobieraj kluczy prywatnych `.json` na swój komputer:** Używaj `gcloud auth application-default login --impersonate-service-account=NAZWA_SA@TWOJ_PROJEKT.iam.gserviceaccount.com`.
 3. **Pamiętaj o zmiennej środowiskowej `$PORT` w Cloud Run:** Twój serwer w kontenerze **musi** nasłuchiwać na porcie podanym w zmiennej `$PORT` (domyślnie `8080`) i na adresie `0.0.0.0` (a nie `127.0.0.1`).
 4. **Zawsze konfiguruj limity czasu (Timeouts):** Wywołania modeli LLM trwają dłużej niż standardowe zapytania REST (ustaw timeout na minimum 30-60 sekund).
 5. **Śledź koszty:** Wykorzystaj mechanizm *Scale-to-Zero* w Cloud Run oraz darmowe pakiety (Free Tier) w GCP.

@@ -25,7 +25,7 @@ flowchart TD
 
 ## Program kursu
 
-Kurs składa się z 8 modułów merytorycznych, ułożonych w logiczną ścieżkę od protokołów komunikacyjnych, przez infrastrukturę AI i konteneryzację, aż po bezpieczeństwo i kontrolę uprawnień.
+Kurs składa się z modułu wprowadzającego (00) oraz 8 modułów merytorycznych (01–08), ułożonych w logiczną ścieżkę od podstaw GCP, przez protokoły komunikacyjne i infrastrukturę AI, aż po bezpieczeństwo i kontrolę uprawnień.
 
 | Moduł | Temat | Zakres wiedzy |
 | :--- | :--- | :--- |
@@ -49,4 +49,4 @@ Aby w pełni skorzystać z kursu, przydatna będzie:
 * Ogólne pojęcie o **konteneryzacji (Docker)**.
 * Zainstalowane narzędzie wiersza poleceń [`gcloud CLI`](https://cloud.google.com/sdk/docs/install) (lub dostęp do Google Cloud Shell w przeglądarce).
 
-Przejdź do [Modułu 1: Protokół A2A (Agent-to-Agent)](01-a2a-protocol.md), aby rozpocząć naukę od podstaw komunikacji między autonomicznymi agentami.
+Przejdź do [Modułu 0: Przewodnik Startowy dla Juniora](00-gcp-basics-for-juniors.md), aby rozpocząć naukę od podstaw Google Cloud Platform.

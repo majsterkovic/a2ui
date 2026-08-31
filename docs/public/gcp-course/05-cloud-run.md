@@ -69,7 +69,7 @@ USER appuser
 # Cloud Run przekazuje zmienną PORT (domyślnie 8080)
 EXPOSE 8080
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080", "--workers", "1"]
+CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port ${PORT:-8080} --workers 1"]
 ```
 
 ---
@@ -78,9 +78,6 @@ CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080", "--workers", 
 
 ```python
 from fastapi import FastAPI
-from fastapi.responses import StreamingResponse
-import asyncio
-import os
 
 app = FastAPI(title="A2UI Agent Service")
 
@@ -108,7 +105,6 @@ gcloud config set project TWOJ_PROJEKT_ID
 gcloud run deploy a2ui-agent-service \
   --source . \
   --region europe-west1 \
-  --platform managed \
   --service-account agent-runner-sa@TWOJ_PROJEKT_ID.iam.gserviceaccount.com \
   --memory 1Gi \
   --cpu 1 \
@@ -134,7 +130,7 @@ Wszystkie strumienie `stdout` i `stderr` generowane przez Twojego agenta trafiaj
 Możesz podglądać logi w czasie rzeczywistym z poziomu terminala:
 
 ```bash
-gcloud run services logs tail a2ui-agent-service --region europe-west1
+gcloud beta run services logs tail a2ui-agent-service --region europe-west1
 ```
 
 ---

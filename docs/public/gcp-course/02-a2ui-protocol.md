@@ -28,108 +28,150 @@ sequenceDiagram
     participant R as 📱 Renderer A2UI
     participant A as 🤖 Agent (Cloud Run)
 
-    U->>R: 1. Wpisuje polecenie
-    R->>A: 2. Przesyła żądanie (REST/SSE)
-    A-->>R: 3. Strumieniuje komponenty A2UI JSON
-    R->>U: 4. Renderuje interaktywny formularz
-    U->>R: 5. Wypełnia formularz i klika przycisk
-    R->>A: 6. Wysyła zdarzenie 'userAction' ze stanem
-    A-->>R: 7. Odsyła zaktualizowany widok (potwierdzenie)
+    U->>R: Wpisuje polecenie
+    R->>A: Przesyła żądanie (REST/SSE)
+    A-->>R: Strumieniuje komponenty A2UI JSON
+    R->>U: Renderuje interaktywny formularz
+    U->>R: Wypełnia formularz i klika przycisk
+    R->>A: Wysyła zdarzenie akcji ze stanem
+    A-->>R: Odsyła zaktualizowany widok
 ```
 
 ---
 
 ## Główne filary protokołu A2UI
 
-### 1. Spłaszczona lista komponentów (Component Adjacency List)
-Zamiast głęboko zagnieżdżonego drzewa JSON (które jest trudne do strumieniowania i parsowania przez LLM w czasie rzeczywistym), A2UI stosuje **płaską tablicę komponentów**. Każdy komponent posiada unikalne `id` oraz odwołuje się do swoich dzieci za pomocą identyfikatorów.
+### 1. Komunikaty strumieniowe (Streaming Messages)
+Agent przesyła dane jako sekwencję komunikatów JSON, z których każdy pełni określoną rolę:
 
-### 2. Dwukierunkowe wiązanie danych (Two-Way Data Binding)
-Stan formularza nie jest zakodowany na stałe w komponentach. Komponenty wskazują na ścieżki w modelu danych za pomocą standardu **JSON Pointer** (np. `/booking/date` lub `/customer/email`). 
+* `createSurface` — tworzy nową powierzchnię UI (ang. *surface*) i wskazuje katalog komponentów.
+* `updateComponents` — dodaje lub aktualizuje drzewo komponentów na powierzchni.
+* `updateDataModel` — ustawia lub zmienia wartości w modelu danych.
+* `deleteSurface` — zamyka i usuwa powierzchnię.
+
+### 2. Spłaszczona lista komponentów (Component Adjacency List)
+Zamiast głęboko zagnieżdżonego drzewa JSON (które jest trudne do strumieniowania i parsowania przez LLM w czasie rzeczywistym), A2UI stosuje **płaską tablicę komponentów**. Każdy komponent posiada unikalne `id` oraz odwołuje się do swoich dzieci za pomocą identyfikatorów (`child` lub `children`).
+
+### 3. Dwukierunkowe wiązanie danych (Two-Way Data Binding)
+Stan formularza nie jest zakodowany na stałe w komponentach. Komponenty wskazują na ścieżki w modelu danych za pomocą standardu **JSON Pointer** (np. `{"path": "/booking/date"}` lub `{"path": "/customer/email"}`). 
 Gdy użytkownik wpisuje tekst w pole, model danych w kliencie aktualizuje się automatycznie.
 
-### 3. Katalogi komponentów (Component Catalogs)
+### 4. Katalogi komponentów (Component Catalogs)
 Renderer posiada zdefiniowany katalog znanych komponentów (np. `Text`, `Button`, `TextField`, `Card`, `Table`, `Select`). Agent nie przesyła kodu implementacji komponentu, a jedynie nazwę z katalogu i parametry. Zapobiega to wstrzykiwaniu złośliwego kodu do przeglądarki.
 
-### 4. Zdarzenia i akcje (`userAction`)
-Gdy użytkownik kliknie przycisk, renderer nie przeładowuje strony, lecz generuje komunikat akcji (`userAction`) i przesyła go do agenta wraz ze zsynchronizowanym stanem danych.
+### 5. Zdarzenia i akcje (`action`)
+Gdy użytkownik kliknie przycisk, renderer nie przeładowuje strony, lecz generuje komunikat `action` (*Client-to-Server*) i przesyła go do agenta wraz z kontekstem zdarzenia.
 
 ---
 
-## Przykładowy ładunek A2UI (JSON)
+## Przykładowy ładunek A2UI v0.9.1 (JSON)
 
-Poniżej znajduje się przykładowy komunikat generowany przez Agenta, tworzący prosty formularz kontaktowy:
+W specyfikacji A2UI v0.9.1 agent przesyła dane w formie **sekwencji komunikatów strumieniowych**, a nie jednego monolitycznego obiektu. Poniżej pokazujemy trzy komunikaty, które razem tworzą prosty formularz kontaktowy:
+
+**Krok 1 — Utworzenie powierzchni i drzewa komponentów:**
 
 ```json
 {
-  "protocol_version": "0.9.1",
-  "data_model": {
-    "contact": {
+  "version": "v0.9.1",
+  "createSurface": {
+    "surfaceId": "contact_form_1",
+    "catalogId": "https://a2ui.org/specification/v0_9/catalogs/basic/catalog.json"
+  }
+}
+```
+
+```json
+{
+  "version": "v0.9.1",
+  "updateComponents": {
+    "surfaceId": "contact_form_1",
+    "components": [
+      {
+        "id": "root",
+        "component": "Card",
+        "child": "form_column"
+      },
+      {
+        "id": "form_column",
+        "component": "Column",
+        "children": ["form_title", "input_name", "input_email", "btn_submit"]
+      },
+      {
+        "id": "form_title",
+        "component": "Text",
+        "text": "Formularz zgłoszeniowy",
+        "variant": "h2"
+      },
+      {
+        "id": "input_name",
+        "component": "TextField",
+        "label": "Imię i nazwisko",
+        "value": { "path": "/contact/name" }
+      },
+      {
+        "id": "input_email",
+        "component": "TextField",
+        "label": "Adres e-mail",
+        "value": { "path": "/contact/email" }
+      },
+      {
+        "id": "btn_label",
+        "component": "Text",
+        "text": "Wyślij zgłoszenie"
+      },
+      {
+        "id": "btn_submit",
+        "component": "Button",
+        "child": "btn_label",
+        "variant": "primary",
+        "action": {
+          "event": {
+            "name": "submit_contact_form",
+            "context": {
+              "contact_data": { "path": "/contact" }
+            }
+          }
+        }
+      }
+    ]
+  }
+}
+```
+
+**Krok 2 — Inicjalizacja modelu danych:**
+
+```json
+{
+  "version": "v0.9.1",
+  "updateDataModel": {
+    "surfaceId": "contact_form_1",
+    "path": "/contact",
+    "value": {
       "name": "Jan Kowalski",
       "email": "",
       "topic": "Wsparcie techniczne"
     }
-  },
-  "components": [
-    {
-      "id": "root_card",
-      "type": "Card",
-      "properties": {
-        "title": "Formularz zgłoszeniowy"
-      },
-      "children": ["input_name", "input_email", "btn_submit"]
-    },
-    {
-      "id": "input_name",
-      "type": "TextField",
-      "properties": {
-        "label": "Imię i nazwisko",
-        "value": { "$ref": "/contact/name" }
-      }
-    },
-    {
-      "id": "input_email",
-      "type": "TextField",
-      "properties": {
-        "label": "Adres e-mail",
-        "placeholder": "jan@firma.pl",
-        "value": { "$ref": "/contact/email" }
-      }
-    },
-    {
-      "id": "btn_submit",
-      "type": "Button",
-      "properties": {
-        "label": "Wyślij zgłoszenie",
-        "variant": "primary"
-      },
-      "actions": {
-        "on_click": {
-          "action_type": "userAction",
-          "action_name": "submit_contact_form",
-          "payload": {
-            "form_state": { "$ref": "/contact" }
-          }
-        }
-      }
-    }
-  ]
+  }
 }
 ```
 
 ### Co dzieje się po kliknięciu przycisku?
-Po kliknięciu przycisku `Wyślij zgłoszenie`, renderer A2UI po stronie przeglądarki generuje zapytanie do Agenta:
+Po kliknięciu przycisku `Wyślij zgłoszenie`, renderer A2UI generuje komunikat akcji (*Client-to-Server*) zgodny ze schematem specyfikacji:
 
 ```json
 {
-  "event_type": "userAction",
-  "action_name": "submit_contact_form",
-  "timestamp": "2026-08-31T22:00:00Z",
-  "data": {
-    "form_state": {
-      "name": "Jan Kowalski",
-      "email": "jan.kowalski@example.com",
-      "topic": "Wsparcie techniczne"
+  "version": "v0.9.1",
+  "action": {
+    "name": "submit_contact_form",
+    "surfaceId": "contact_form_1",
+    "sourceComponentId": "btn_submit",
+    "timestamp": "2026-08-31T22:00:00Z",
+    "context": {
+      "contact_data": {
+        "name": "Jan Kowalski",
+        "email": "jan.kowalski@example.com",
+        "topic": "Wsparcie techniczne"
+      }
     }
   }
 }

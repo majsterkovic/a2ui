@@ -137,7 +137,7 @@ Poniżej znajduje się prosty przykład dwóch współpracujących agentów: **A
 
 ```python
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from typing import Dict, Any, Optional
 import datetime
 
